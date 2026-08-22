@@ -29,7 +29,7 @@
   --line:#2b3a2c; --line-strong:#3a4e3a;
   --ink:#e7f0e3; --ink-soft:#b7c7b2; --ink-faint:#7f9280;
   --brand:#0b241a; --brand-ink:#eaf3e6;
-  --accent:#67c17f; --accent-strong:#7fd694; --accent-tint:#1d3524; --accent-ink:#bdeecb;
+  --accent:#36844B; --accent-strong:#7fd694; --accent-tint:#1d3524; --accent-ink:#bdeecb;
   --cadence:#e3ab4c; --cadence-tint:#3a2c10; --cadence-ink:#f6d999;
   --apps:#b19bea; --apps-tint:#2c2447; --apps-ink:#d9ccf9;
   --trigger:#8fa9e6; --trigger-tint:#1c2740; --trigger-ink:#c7d5f5;
@@ -129,6 +129,12 @@ a{color:inherit;}
 .field-full{grid-column:1 / -1;}
 .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint);margin-bottom:6px;font-weight:600;}
 .field select, .field input[type=text]{width:100%;border:1px solid var(--line-strong);background:var(--surface-2);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;color:var(--ink);}
+/* The open dropdown list for a native <select> doesn't inherit theme colors the way the
+   closed control does, browsers render it with their own default (usually white) background
+   regardless of what the <select> itself is styled as. Setting color/background on <option>
+   directly keeps every dropdown's popup readable and on-theme in both light and dark mode. */
+select option{background:var(--surface); color:var(--ink);}
+select option:checked, select option:hover{background:var(--accent); color:#fff;}
 .persona-add{display:flex;gap:6px;margin-top:6px;}
 .persona-add input{flex:1;}
 .persona-add button{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:var(--radius-sm);padding:0 9px;color:var(--ink-soft);}
@@ -291,16 +297,12 @@ table.seedmatrix{border-collapse:separate;border-spacing:4px;width:100%;}
     <span class="material-symbols-rounded">upload_file</span>
   </button>
   <input type="file" id="importBriefFile" accept="application/json,.json" class="vis-hidden">
-  <div class="appbar-field" data-tip="Choose which model powers generation. Claude runs pre-authenticated inside Claude's environment with no key needed. Gemini always needs your own API key below, regardless of environment.">
+  <div class="appbar-field" data-tip="Choose which model powers generation. This page uses shared access, no key needed either way.">
     <span class="material-symbols-rounded" style="font-size:16px">smart_toy</span>
     <select id="providerSelect">
       <option value="claude">Claude</option>
       <option value="gemini">Gemini</option>
     </select>
-  </div>
-  <div class="appbar-field" id="apiKeyField" data-tip="Leave blank to use this page's shared access if it's been set up. Otherwise required for Gemini always, and required for Claude when running outside Claude's environment. A key you enter here is used directly and stays only in this browser tab.">
-    <span class="material-symbols-rounded" style="font-size:16px">key</span>
-    <input type="password" id="apiKeyInput" placeholder="API key (optional)">
   </div>
   <button class="iconbtn" id="themeToggle" data-tip="Switch between light and dark surface. Your choice is remembered.">
     <span class="material-symbols-rounded" id="themeIcon">dark_mode</span>
@@ -1281,9 +1283,22 @@ function extractClaudeText(data){
   return (data.content||[]).map(b=> b.type==='text' ? b.text : '').join('\n');
 }
 
+// Different sources produce different error shapes: our own worker returns a plain
+// { error: "string" }, while a passed-through Claude failure looks like
+// { type:"error", error:{ type, message } } and a passed-through Gemini failure looks
+// like { error:{ code, message, status } }. Blindly using data.error broke when it was
+// an object, producing "[object Object]" instead of the real message.
+function extractErrorMessage(data, fallback){
+  if(!data) return fallback;
+  if(typeof data.error === 'string') return data.error;
+  if(data.error && typeof data.error.message === 'string') return data.error.message;
+  if(typeof data.message === 'string') return data.message;
+  return fallback;
+}
+
 async function callModel(prompt, max_tokens){
   const provider = State.provider || 'claude';
-  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  const apiKey = ''; // manual key entry removed; this page always uses the shared proxy
   const cfg = PROVIDERS[provider];
 
   // Route through the shared proxy when one is configured and the visitor hasn't
@@ -1295,7 +1310,7 @@ async function callModel(prompt, max_tokens){
       body: JSON.stringify({ provider, model: cfg.model, prompt, maxTokens: max_tokens }),
     });
     const data = await res.json();
-    if(!res.ok){ throw new Error(data.error || ('Proxy error '+res.status)); }
+    if(!res.ok){ throw new Error(extractErrorMessage(data, 'Proxy error '+res.status)); }
     return provider==='gemini' ? extractGeminiText(data) : extractClaudeText(data);
   }
 
@@ -1318,7 +1333,7 @@ async function callModel(prompt, max_tokens){
         },
       }),
     });
-    if(!res.ok){ throw new Error('Gemini API error '+res.status); }
+    if(!res.ok){ const errData = await res.json().catch(()=>null); throw new Error(extractErrorMessage(errData, 'Gemini API error '+res.status)); }
     const data = await res.json();
     return extractGeminiText(data);
   }
@@ -1330,7 +1345,7 @@ async function callModel(prompt, max_tokens){
     method:'POST', headers,
     body: JSON.stringify({ model:cfg.model, max_tokens, messages:[{role:'user', content: prompt}] })
   });
-  if(!res.ok){ throw new Error('Claude API error '+res.status); }
+  if(!res.ok){ const errData = await res.json().catch(()=>null); throw new Error(extractErrorMessage(errData, 'Claude API error '+res.status)); }
   const data = await res.json();
   return extractClaudeText(data);
 }
@@ -2412,14 +2427,11 @@ document.getElementById('themeToggle').addEventListener('click', async ()=>{
 document.getElementById('providerSelect').addEventListener('change', async (e)=>{
   State.provider = e.target.value;
   await Store.set('provider', State.provider);
-  const cfg = PROVIDERS[State.provider];
-  document.getElementById('apiKeyInput').placeholder = cfg.needsKeyAlways ? 'API key (required)' : 'API key (optional)';
 });
 async function initProvider(){
   const saved = await Store.get('provider');
   State.provider = (saved && PROVIDERS[saved]) ? saved : 'claude';
   document.getElementById('providerSelect').value = State.provider;
-  document.getElementById('apiKeyInput').placeholder = PROVIDERS[State.provider].needsKeyAlways ? 'API key (required)' : 'API key (optional)';
 }
 
 /* ============================= INIT ============================= */
