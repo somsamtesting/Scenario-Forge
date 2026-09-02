@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scenario Forge: Galaxy Ecosystem Use Case Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<style>
+:root{
+  --bg:#eef3ec; --canvas:#f4f8f2; --surface:#ffffff; --surface-2:#f6faf4;
+  --line:#d8e6d4; --line-strong:#c3d8bd;
+  --ink:#1f2b21; --ink-soft:#4c5c4c; --ink-faint:#7c8c7a;
+  --brand:#123524; --brand-ink:#eaf3e6;
+  --accent:#3f7a4f; --accent-strong:#2c5c3a; --accent-tint:#e2f0dd; --accent-ink:#173d22;
+  --cadence:#b5790a; --cadence-tint:#fbeed2; --cadence-ink:#6b4405;
+  --apps:#6a4bb0; --apps-tint:#ece5f8; --apps-ink:#40266f;
+  --trigger:#3b5aa0; --trigger-tint:#e2e9f7; --trigger-ink:#22345f;
+  --error:#b5502f; --error-tint:#f8e3da; --error-ink:#7a3216;
+  --shadow: 0 1px 2px rgba(18,53,36,.06), 0 4px 14px rgba(18,53,36,.06);
+  --radius-pill: 999px; --radius-card: 16px; --radius-sm: 9px;
+  --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+:root[data-theme="dark"]{
+  --bg:#0f1712; --canvas:#121b16; --surface:#182219; --surface-2:#1c271d;
+  --line:#2b3a2c; --line-strong:#3a4e3a;
+  --ink:#e7f0e3; --ink-soft:#b7c7b2; --ink-faint:#7f9280;
+  --brand:#0b241a; --brand-ink:#eaf3e6;
+  --accent:#36844B; --accent-strong:#7fd694; --accent-tint:#1d3524; --accent-ink:#bdeecb;
+  --cadence:#e3ab4c; --cadence-tint:#3a2c10; --cadence-ink:#f6d999;
+  --apps:#b19bea; --apps-tint:#2c2447; --apps-ink:#d9ccf9;
+  --trigger:#8fa9e6; --trigger-tint:#1c2740; --trigger-ink:#c7d5f5;
+  --error:#e08a63; --error-tint:#3a2015; --error-ink:#f4c3a9;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--canvas);color:var(--ink);font-family:var(--font-ui);height:100%;}
+body{min-height:100vh;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.material-symbols-rounded{font-variation-settings:'opsz' 24,'wght' 400,'FILL' 0,'GRAD' 0;font-size:20px;line-height:1;vertical-align:middle;}
+code, .mono, .eyebrow, .idtag{font-family:var(--font-mono);}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+a{color:inherit;}
+
+/* App bar */
+.appbar{position:sticky;top:0;z-index:40;background:var(--brand);color:var(--brand-ink);display:flex;align-items:center;gap:10px 14px;padding:10px 18px;box-shadow:var(--shadow);flex:none;flex-wrap:wrap;row-gap:8px;}
+.appbar .brand-mark{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:.01em;}
+.appbar .brand-mark .material-symbols-rounded{font-size:24px;}
+.appbar .spacer{flex:1;}
+.appbar-field{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:var(--radius-sm);padding:5px 10px;}
+.appbar-field input, .appbar-field select{background:transparent;border:none;color:var(--brand-ink);outline:none;font-size:12.5px;min-width:90px;}
+.appbar-field input::placeholder{color:rgba(234,243,230,.55);}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--brand-ink);}
+.iconbtn:hover{background:rgba(255,255,255,.16);}
+.appbar select{border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:var(--brand-ink);padding:6px 8px;font-size:12.5px;}
+
+/* Layout */
+.wrap{max-width:1400px;margin:0 auto;padding:18px;display:flex;gap:18px;flex:1;min-height:0;width:100%;box-sizing:border-box;}
+.col{overflow-y:auto;height:100%;min-width:0;-webkit-overflow-scrolling:touch;padding-right:12px;}
+.col::-webkit-scrollbar{width:10px;}
+.col::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:99px;border:2px solid var(--canvas);background-clip:padding-box;}
+.col::-webkit-scrollbar-track{background:transparent;}
+.col-left{flex:1 1 58%;padding-bottom:40px;}
+.col-right{flex:1 1 42%;max-width:520px;padding-bottom:40px;}
+@media (max-width:980px){
+  html,body{height:auto;}
+  body{height:auto;overflow:visible;}
+  .wrap{flex-direction:column;overflow:visible;height:auto;}
+  .col{overflow-y:visible;height:auto;}
+  .col-right{max-width:none;}
+}
+.section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);padding:18px 18px 16px;margin-bottom:16px;box-shadow:var(--shadow);}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.section-head h2{font-size:14.5px;margin:0;display:flex;align-items:center;gap:8px;}
+.section-head h2 .material-symbols-rounded{color:var(--accent);}
+.section-head .count-badge{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-pill);padding:2px 9px;}
+.smallbtn{font-size:11.5px;font-weight:600;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-soft);border-radius:var(--radius-pill);padding:5px 11px;display:inline-flex;align-items:center;gap:5px;}
+.smallbtn:hover{border-color:var(--accent);color:var(--accent-strong);}
+.smallbtn .material-symbols-rounded{font-size:15px;}
+.smallbtn.iconOnly{padding:6px;width:28px;height:28px;justify-content:center;}
+.smallbtn.iconOnly .material-symbols-rounded{font-size:16px;}
+
+.pillgrid{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-pill);padding:7px 13px 7px 10px;font-size:12.5px;font-weight:600;border:1.5px solid var(--line-strong);background:var(--surface-2);color:var(--ink-soft);transition:all .12s ease;position:relative;}
+.pill .material-symbols-rounded{font-size:17px;}
+.pill:hover{transform:translateY(-1px);}
+.pill[data-state="allowed"]{background:var(--surface-2);color:var(--ink-soft);border-color:var(--line-strong);}
+.pill[data-state="required"]{background:var(--accent);color:#fff;border-color:var(--accent-strong);}
+.pill[data-state="excluded"]{background:transparent;color:var(--ink-faint);border-color:var(--line);text-decoration:line-through;opacity:.55;}
+.pillgrid.apps .pill[data-state="required"]{background:var(--accent);border-color:var(--accent-strong);color:#fff;}
+.pillgrid.cadence .pill[data-state="required"]{background:var(--accent);border-color:var(--accent-strong);color:#fff;}
+.addrow{display:flex;gap:8px;margin-top:10px;}
+.addrow input{flex:1;border:1px solid var(--line-strong);background:var(--surface-2);border-radius:var(--radius-sm);padding:8px 10px;font-size:12.5px;color:var(--ink);}
+.addrow input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+.addrow button{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-faint);border-radius:var(--radius-sm);padding:8px 13px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:5px;cursor:not-allowed;transition:all .12s ease;}
+.addrow button:not(:disabled){border-color:var(--accent-strong);background:var(--accent);color:#fff;cursor:pointer;}
+
+/* custom pill edit affordance */
+.pill-wrap{display:inline-flex;align-items:center;gap:3px;}
+.pill-edit-btn{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-faint);display:flex;align-items:center;justify-content:center;padding:0;}
+.pill-edit-btn:hover{border-color:var(--accent);color:var(--accent-strong);background:var(--accent-tint);}
+.pill-edit-btn .material-symbols-rounded{font-size:13px;}
+.tag-editor-popover{position:fixed;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius-card);box-shadow:var(--shadow);padding:12px;min-width:230px;max-width:280px;z-index:9995;}
+.tag-editor-title{font-size:12.5px;font-weight:700;margin-bottom:6px;color:var(--ink);}
+.tag-editor-hint{font-size:10.5px;color:var(--ink-faint);margin-bottom:8px;}
+.tag-editor-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:220px;overflow-y:auto;margin-bottom:10px;}
+.tag-check{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-soft);}
+.tag-check input{accent-color:var(--accent);}
+.tag-editor-input{width:100%;border:1px solid var(--line-strong);background:var(--surface-2);border-radius:var(--radius-sm);padding:7px 9px;font-size:12px;color:var(--ink);margin-bottom:10px;}
+.tag-editor-actions{display:flex;gap:6px;justify-content:flex-end;}
+.google-toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft);margin-bottom:10px;}
+.switch{position:relative;width:34px;height:19px;background:var(--line-strong);border-radius:999px;border:none;flex:none;}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;background:#fff;border-radius:50%;transition:.15s;}
+.switch[aria-checked="true"]{background:var(--accent);}
+.switch[aria-checked="true"]::after{left:17px;}
+
+/* brief check */
+.checklist{display:flex;flex-direction:column;gap:6px;}
+.checkline{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:7px 10px;border-radius:var(--radius-sm);background:var(--cadence-tint);color:var(--cadence-ink);}
+.checkline.ok{background:var(--accent-tint);color:var(--accent-ink);}
+.checkline .material-symbols-rounded{font-size:17px;}
+
+/* config row */
+.config-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;}
+.field-full{grid-column:1 / -1;}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint);margin-bottom:6px;font-weight:600;}
+.field select, .field input[type=text]{width:100%;border:1px solid var(--line-strong);background:var(--surface-2);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;color:var(--ink);}
+/* The open dropdown list for a native <select> doesn't inherit theme colors the way the
+   closed control does, browsers render it with their own default (usually white) background
+   regardless of what the <select> itself is styled as. Setting color/background on <option>
+   directly keeps every dropdown's popup readable and on-theme in both light and dark mode. */
+select option{background:var(--surface); color:var(--ink);}
+select option:checked, select option:hover{background:var(--accent); color:#fff;}
+.persona-add{display:flex;gap:6px;margin-top:6px;}
+.persona-add input{flex:1;}
+.persona-add button{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:var(--radius-sm);padding:0 9px;color:var(--ink-soft);}
+.segmented{display:flex;border:1px solid var(--line-strong);border-radius:var(--radius-pill);overflow:hidden;}
+.segmented button{flex:1;border:none;background:var(--surface-2);color:var(--ink-soft);padding:8px 6px;font-size:11.5px;font-weight:600;border-right:1px solid var(--line-strong);}
+.segmented button:last-child{border-right:none;}
+.segmented button[aria-pressed="true"]{background:var(--accent);color:#fff;}
+.range-row{display:flex;align-items:center;gap:10px;}
+.range-row input[type=range]{flex:1;accent-color:var(--accent);}
+.range-val{font-family:var(--font-mono);font-size:13px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:4px 9px;min-width:28px;text-align:center;}
+.check-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);}
+.actions-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.btn{border-radius:var(--radius-pill);padding:10px 18px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--accent-strong);background:var(--accent);color:#fff;transition:background .15s ease,transform .15s ease,box-shadow .15s ease,border-color .15s ease;}
+.btn:hover{background:var(--accent-strong);}
+.btn.ghost{background:var(--surface-2);color:var(--ink-soft);border-color:var(--line-strong);}
+.btn.ghost:hover{color:var(--accent-strong);border-color:var(--accent);}
+.btn.violet{background:var(--apps);border-color:var(--apps-ink);}
+.btn.violet:hover{background:var(--apps-ink);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+#generateBtn:hover:not(:disabled){background:var(--accent-strong);border-color:var(--accent-strong);transform:translateY(-1px);box-shadow:0 4px 14px rgba(18,53,36,.24);}
+#generateBtn:active:not(:disabled){transform:translateY(0);box-shadow:0 1px 4px rgba(18,53,36,.2);}
+.btn .material-symbols-rounded{font-size:18px;}
+
+/* metrics + matrix */
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;}
+.metric{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px;}
+.metric .eyebrow{margin-bottom:3px;}
+.metric .val{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent-strong);}
+.matrix-wrap{overflow-x:auto;}
+table.seedmatrix{border-collapse:separate;border-spacing:4px;width:100%;}
+.seedmatrix th{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);font-weight:600;padding:4px 6px;text-align:left;}
+.seedmatrix td{width:64px;height:34px;border-radius:7px;background:var(--surface-2);border:1px solid var(--line);}
+.seedmatrix td.claimed{background:var(--trigger-tint);border-color:var(--trigger);}
+.seedmatrix td.written{background:var(--trigger);border-color:var(--trigger-ink);}
+.seedmatrix .rowlabel{font-size:11.5px;font-weight:600;color:var(--ink-soft);white-space:nowrap;padding-right:8px;}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:10px;position:relative;}
+.card-top{display:flex;align-items:flex-start;gap:10px;}
+.idx-badge{font-family:var(--font-mono);font-size:11px;background:var(--accent-tint);color:var(--accent-ink);border-radius:var(--radius-sm);padding:3px 8px;flex:none;}
+.card-title{font-size:15px;font-weight:700;line-height:1.3;flex:1;}
+.feas-badge{font-size:10.5px;font-weight:700;border-radius:var(--radius-pill);padding:3px 9px;white-space:nowrap;}
+.feas-badge.ships{background:var(--accent-tint);color:var(--accent-ink);}
+.feas-badge.near{background:var(--cadence-tint);color:var(--cadence-ink);}
+.feas-badge.spec{background:var(--apps-tint);color:var(--apps-ink);}
+.narrative{font-size:12.8px;color:var(--ink-soft);line-height:1.55;}
+.chiprow{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{font-size:10.5px;font-weight:600;border-radius:var(--radius-pill);padding:3px 9px;display:inline-flex;align-items:center;gap:4px;border:1px solid transparent;}
+.chip .material-symbols-rounded{font-size:13px;}
+.chip.cadence{background:var(--cadence-tint);color:var(--cadence-ink);}
+.chip.domain{background:var(--accent-tint);color:var(--accent-ink);}
+.chip.trigger{background:var(--trigger-tint);color:var(--trigger-ink);}
+.chip.device{background:var(--surface-2);color:var(--ink-soft);border-color:var(--line-strong);}
+.chip.app{background:var(--apps-tint);color:var(--apps-ink);}
+.card-section{font-size:12.5px;}
+.card-section .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);font-weight:700;margin-bottom:3px;}
+.steps{margin:0;padding-left:18px;}
+.steps li{margin-bottom:2px;}
+.card-footer{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center;border-top:1px solid var(--line);padding-top:10px;}
+.cardbtn{font-size:11px;font-weight:600;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-soft);border-radius:var(--radius-pill);padding:5px 10px;display:inline-flex;align-items:center;gap:4px;}
+.cardbtn:hover{border-color:var(--accent);color:var(--accent-strong);}
+.cardbtn.violet{border-color:var(--apps);color:var(--apps-ink);background:var(--apps-tint);}
+.pager{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:11px;color:var(--ink-faint);}
+.pager button{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.pager button:disabled{opacity:.35;}
+.refine-box{display:flex;flex-direction:column;gap:6px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:8px;}
+.refine-box textarea{width:100%;min-height:52px;border:1px solid var(--line-strong);background:var(--surface);border-radius:7px;padding:7px;font-size:12px;color:var(--ink);resize:vertical;}
+.refine-box .rowbtns{display:flex;gap:6px;justify-content:flex-end;}
+.status-strip{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-faint);background:var(--surface-2);border-radius:var(--radius-sm);padding:6px 9px;}
+.spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line-strong);border-top-color:var(--accent);animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.instr-list{font-size:10.5px;color:var(--ink-faint);}
+
+/* branching */
+.steps-custom{margin:0;}
+.step-row{display:flex;gap:6px;align-items:flex-start;font-size:12.8px;margin-bottom:5px;}
+.step-num{color:var(--ink-faint);font-family:var(--font-mono);flex:none;min-width:16px;}
+.step-text{flex:1;color:var(--ink);}
+.branch-btn{flex:none;border:1px solid var(--line-strong);background:var(--surface-2);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--ink-faint);padding:0;margin-top:1px;}
+.branch-btn:hover{border-color:var(--trigger);color:var(--trigger-ink);background:var(--trigger-tint);}
+.branch-btn .material-symbols-rounded{font-size:13px;}
+.branch-panel{background:var(--trigger-tint);border:1px solid var(--trigger);border-radius:var(--radius-sm);padding:8px 10px;margin:14px 0 16px 22px;}
+.segmented.mini{display:flex;border:1px solid var(--line-strong);border-radius:var(--radius-sm);overflow:hidden;width:fit-content;background:var(--surface);}
+.segmented.mini button{border:none;background:transparent;color:var(--ink-soft);padding:4px 11px;font-size:10.5px;font-weight:600;border-right:1px solid var(--line-strong);}
+.segmented.mini button:last-child{border-right:none;}
+.segmented.mini button[aria-pressed="true"]{background:var(--trigger);color:#fff;}
+.branch-premise{font-size:11.5px;color:var(--trigger-ink);margin-top:6px;font-style:italic;}
+.branch-form{background:var(--surface-2);border:1px solid var(--trigger);border-radius:var(--radius-sm);padding:10px;display:flex;flex-direction:column;gap:8px;}
+.branch-form textarea{width:100%;min-height:44px;border:1px solid var(--line-strong);background:var(--surface);border-radius:7px;padding:7px;font-size:12px;color:var(--ink);resize:vertical;}
+.branch-form input[type=number]{width:56px;border:1px solid var(--line-strong);background:var(--surface);border-radius:7px;padding:5px 7px;font-size:12px;color:var(--ink);}
+.cardbtn.trigger{border-color:var(--trigger);color:var(--trigger-ink);background:var(--trigger-tint);}
+
+/* info tabs (job to be done / user value / why multi-device / friction / privacy) */
+.info-tabs{display:flex;border:1px solid var(--line-strong);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:8px;}
+.info-tabs button{flex:1;border:none;background:var(--surface-2);color:var(--ink-soft);padding:6px 4px;font-size:10.5px;font-weight:600;border-right:1px solid var(--line-strong);}
+.info-tabs button:last-child{border-right:none;}
+.info-tabs button[aria-pressed="true"]{background:var(--accent);color:#fff;}
+.info-tab-content{font-size:12.5px;color:var(--ink);line-height:1.5;}
+
+/* tree modal */
+.tree-modal-backdrop{position:fixed;inset:0;background:rgba(18,53,36,.45);z-index:9990;display:flex;align-items:center;justify-content:center;padding:20px;}
+:root[data-theme="dark"] .tree-modal-backdrop{background:rgba(0,0,0,.6);}
+.tree-modal{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--line);box-shadow:var(--shadow);max-width:680px;width:100%;max-height:80vh;display:flex;flex-direction:column;padding:18px;}
+.tree-modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex:none;}
+.tree-modal-body{overflow-y:auto;overflow-x:hidden;padding-right:6px;flex:1;min-height:0;}
+.tree-root{display:flex;flex-direction:column;align-items:stretch;}
+.tree-node{display:block;border:1.5px solid var(--trigger);background:var(--trigger-tint);color:var(--trigger-ink);border-radius:var(--radius-sm);padding:8px 12px;}
+.tree-node-title{font-size:12px;font-weight:700;}
+.tree-node.root{background:var(--accent-tint);border-color:var(--accent);color:var(--accent-ink);}
+.tree-node.root .tree-node-title{font-size:13px;}
+.tree-narrative{font-size:11px;font-weight:400;margin-top:6px;line-height:1.45;opacity:.9;}
+.tree-premise{font-size:10.5px;font-weight:400;margin-top:3px;opacity:.85;}
+.tree-node.path{cursor:pointer;}
+.tree-node.path:hover{filter:brightness(0.96);}
+.tree-node.path.active{background:var(--trigger);color:#fff;}
+.tree-children{margin-left:22px;border-left:2px solid var(--line-strong);padding-left:16px;margin-top:10px;}
+.tree-fork{margin-bottom:4px;}
+.tree-forklabel{font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:700;}
+.tree-paths{display:flex;flex-direction:column;gap:10px;}
+.tree-branch-slot{margin-top:14px;}
+.mini-select{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:var(--radius-pill);padding:5px 10px;font-size:11.5px;color:var(--ink-soft);max-width:200px;}
+.load-one-btn{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-family:inherit;}
+.load-one-btn span.material-symbols-rounded{flex:none;}
+#savedBriefsControl .load-one-btn, #savedBriefsControl select{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:var(--brand-ink);border-radius:var(--radius-sm);padding:5px 9px;font-size:12.5px;max-width:170px;}
+#savedBriefsControl .load-one-btn:hover{background:rgba(255,255,255,.16);}
+#savedBriefsControl .load-one-btn span.material-symbols-rounded{font-size:15px;}
+.storyboard-panel{background:var(--apps-tint);border:1px solid var(--apps);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--apps-ink);}
+.storyboard-panel h4{margin:0 0 6px;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;}
+.panel-block{margin-bottom:8px;}
+.panel-block .lbl{font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;opacity:.8;margin-bottom:2px;}
+
+/* tooltip */
+#tooltip{position:fixed;z-index:9999;max-width:240px;background:var(--brand);color:var(--brand-ink);font-size:11.5px;line-height:1.4;border-radius:8px;padding:8px 10px;box-shadow:var(--shadow);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .1s ease, transform .1s ease;}
+#tooltip.show{opacity:1;transform:translateY(0);}
+
+.export-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.cards-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:16px;font-size:12.5px;color:var(--ink-soft);}
+.cards-pagination button{border:1px solid var(--line-strong);background:var(--surface-2);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+.cards-pagination button:hover:not(:disabled){border-color:var(--accent);color:var(--accent-strong);}
+.cards-pagination button:disabled{opacity:.35;cursor:not-allowed;}
+.empty-state{text-align:center;padding:40px 10px;color:var(--ink-faint);font-size:13px;}
+.suggest-panel{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.suggest-item{background:var(--accent-tint);color:var(--accent-ink);border-radius:var(--radius-sm);padding:9px 11px;font-size:12.5px;}
+.suggest-item b{display:block;font-size:12.5px;margin-bottom:2px;}
+.vis-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+@media (max-width:640px){.metrics{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div id="tooltip" role="tooltip"></div>
+
+<header class="appbar">
+  <div class="brand-mark"><span class="material-symbols-rounded">hub</span>Scenario Forge</div>
+  <div class="spacer"></div>
+  <div class="appbar-field" id="savedBriefsField" data-tip="Saved briefs: load a previously saved pill configuration and settings.">
+    <span class="material-symbols-rounded" style="font-size:16px">bookmark</span>
+    <div id="savedBriefsControl"></div>
+  </div>
+  <button class="iconbtn" id="saveBriefBtn" data-tip="Save the current brief (all pill states, persona, region, feasibility, length, and count). Stores it here and downloads a file.">
+    <span class="material-symbols-rounded">save</span>
+  </button>
+  <button class="iconbtn" id="importBriefBtn" data-tip="Import a brief from a previously exported file.">
+    <span class="material-symbols-rounded">upload_file</span>
+  </button>
+  <input type="file" id="importBriefFile" accept="application/json,.json" class="vis-hidden">
+  <div class="appbar-field" data-tip="Choose which model powers generation. This page uses shared access, no key needed either way.">
+    <span class="material-symbols-rounded" style="font-size:16px">smart_toy</span>
+    <select id="providerSelect">
+      <option value="gemini" selected>Gemini</option>
+      <option value="claude">Claude</option>
+    </select>
+  </div>
+  <button class="iconbtn" id="themeToggle" data-tip="Switch between light and dark surface. Your choice is remembered.">
+    <span class="material-symbols-rounded" id="themeIcon">dark_mode</span>
+  </button>
+</header>
+
+<div class="wrap">
+  <div class="col col-left">
+
+  <section class="section">
+    <div class="section-head">
+      <h2><span class="material-symbols-rounded">smartphone</span>Personal devices</h2>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="smallbtn" data-reset="personal" data-tip="Reset every personal-device pill back to allowed, without touching other sections."><span class="material-symbols-rounded">restart_alt</span>Reset</button>
+        <button class="smallbtn" data-exclude-all="personal" data-tip="Set every pill in this section to excluded, without touching other sections."><span class="material-symbols-rounded">block</span>Exclude all</button>
+      </div>
+    </div>
+    <div class="pillgrid" id="personalGrid"></div>
+    <div class="addrow">
+      <input type="text" id="personalAddInput" placeholder="Add a device not on the list (e.g. Galaxy Tab Active)…" data-tip="Type a device name and add it as required. New devices start with unclassified capability tags. Use the pencil icon on the pill afterward to select which capabilities it actually has.">
+      <button id="personalAddBtn" data-tip="Add this device to the taxonomy as required." disabled><span class="material-symbols-rounded">add</span>Add</button>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2><span class="material-symbols-rounded">kitchen</span>Home devices</h2>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="smallbtn" data-reset="home" data-tip="Reset every home-device pill back to allowed, without touching other sections."><span class="material-symbols-rounded">restart_alt</span>Reset</button>
+        <button class="smallbtn" data-exclude-all="home" data-tip="Set every pill in this section to excluded, without touching other sections."><span class="material-symbols-rounded">block</span>Exclude all</button>
+      </div>
+    </div>
+    <div class="pillgrid" id="homeGrid"></div>
+    <div class="addrow">
+      <input type="text" id="homeAddInput" placeholder="Add a device not on the list (e.g. Ballie)…" data-tip="Type a device name and add it as required. New devices start with unclassified capability tags. Use the pencil icon on the pill afterward to select which capabilities it actually has.">
+      <button id="homeAddBtn" data-tip="Add this device to the taxonomy as required." disabled><span class="material-symbols-rounded">add</span>Add</button>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2><span class="material-symbols-rounded">apps</span>Apps</h2>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="smallbtn" data-reset="apps" data-tip="Reset every app pill back to allowed, without touching other sections."><span class="material-symbols-rounded">restart_alt</span>Reset</button>
+        <button class="smallbtn" data-exclude-all="apps" data-tip="Set every pill in this section to excluded, without touching other sections."><span class="material-symbols-rounded">block</span>Exclude all</button>
+      </div>
+    </div>
+    <div class="google-toggle">
+      <button class="switch" id="googleToggle" role="switch" aria-checked="false" data-tip="Include the Google-bundle layer (Gemini, Maps, Gmail, Drive, Meet, and more) as selectable app pills."></button>
+      Include Google-bundle apps
+    </div>
+    <div class="pillgrid apps" id="appsGrid"></div>
+    <div class="addrow">
+      <input type="text" id="appsAddInput" placeholder="Add an app not on the list (e.g. Samsung Internet Kids)…" data-tip="Type an app name and add it as required. New apps start with no data domain classified. Use the pencil icon on the pill afterward to add its data domains.">
+      <button id="appsAddBtn" data-tip="Add this app to the taxonomy as required." disabled><span class="material-symbols-rounded">add</span>Add</button>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2><span class="material-symbols-rounded">category</span>Domains &amp; activities</h2>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="smallbtn" data-reset="domains" data-tip="Reset every domain pill back to allowed, without touching other sections."><span class="material-symbols-rounded">restart_alt</span>Reset</button>
+        <button class="smallbtn" data-exclude-all="domains" data-tip="Set every pill in this section to excluded, without touching other sections."><span class="material-symbols-rounded">block</span>Exclude all</button>
+      </div>
+    </div>
+    <div class="pillgrid" id="domainsGrid"></div>
+    <div class="addrow">
+      <input type="text" id="domainAddInput" placeholder="Add an activity not on the list (e.g. planning a 60th birthday)…" data-tip="Type an activity and add it as a required domain.">
+      <button id="domainAddBtn" data-tip="Add this domain to the taxonomy as required." disabled><span class="material-symbols-rounded">add</span>Add</button>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2><span class="material-symbols-rounded">schedule</span>Cadence tiers</h2>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="smallbtn" data-reset="cadence" data-tip="Reset every cadence pill back to allowed, without touching other sections."><span class="material-symbols-rounded">restart_alt</span>Reset</button>
+        <button class="smallbtn" data-exclude-all="cadence" data-tip="Set every pill in this section to excluded, without touching other sections."><span class="material-symbols-rounded">block</span>Exclude all</button>
+      </div>
+    </div>
+    <div class="pillgrid cadence" id="cadenceGrid"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2><span class="material-symbols-rounded">fact_check</span>Brief check</h2></div>
+    <div class="checklist" id="briefCheck"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2><span class="material-symbols-rounded">grid_view</span>Seed matrix &amp; coverage</h2></div>
+    <div class="metrics">
+      <div class="metric"><div class="eyebrow">Required</div><div class="val" id="metricRequired">0</div></div>
+      <div class="metric"><div class="eyebrow">Capacity</div><div class="val" id="metricCapacity">0</div></div>
+      <div class="metric"><div class="eyebrow">Generated</div><div class="val" id="metricGenerated">0</div></div>
+      <div class="metric"><div class="eyebrow">Coverage</div><div class="val" id="metricCoverage">0%</div></div>
+      <div class="metric"><div class="eyebrow">Branches</div><div class="val" id="metricBranches">0</div></div>
+    </div>
+    <div class="matrix-wrap"><table class="seedmatrix" id="seedMatrix"></table></div>
+  </section>
+
+  </div>
+  <div class="col col-right">
+
+  <section class="section">
+    <div class="section-head"><h2><span class="material-symbols-rounded">tune</span>Generation settings</h2></div>
+    <div class="config-grid">
+      <div class="field field-full">
+        <label for="personaSelect">Persona</label>
+        <select id="personaSelect" data-tip="Who is at the center of the scenario. Add your own with the field below."></select>
+        <div class="persona-add">
+          <input type="text" id="personaAddInput" placeholder="Add custom persona…">
+          <button id="personaAddBtn" data-tip="Add a typed persona, select it, and persist it across reloads."><span class="material-symbols-rounded" style="font-size:16px">add</span></button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="regionSelect">Region</label>
+        <select id="regionSelect" data-tip="Grounds prices, festivals, weather, and cultural detail in a real place."></select>
+      </div>
+      <div class="field">
+        <label for="feasibilitySelect">Feasibility bar</label>
+        <select id="feasibilitySelect" data-tip="How far the scenario is allowed to reach beyond shipping hardware and features today."></select>
+      </div>
+      <div class="field">
+        <label for="lengthSelect">Scenario length</label>
+        <select id="lengthSelect" data-tip="Controls word count, step count, and which extra fields (dataTouched, kpi, edgeCase, emotionalArc, crossSell) are requested."></select>
+      </div>
+    </div>
+    <div class="config-grid" style="margin-top:14px;">
+      <div class="field">
+        <label for="countRange">Scenario count</label>
+        <div class="range-row">
+          <input type="range" id="countRange" min="3" max="24" value="3" data-tip="How many scenarios to generate this run. Minimum 3, maximum 24.">
+          <span class="range-val" id="countVal">3</span>
+        </div>
+      </div>
+      <div class="field" style="display:flex;align-items:flex-end;">
+        <label class="check-row" style="margin:0;"><input type="checkbox" id="refineToggle" data-tip="Runs a second critique-and-rewrite call per scenario against a 5-point rubric. Roughly doubles cost and time.">Refinement pass (roughly doubles cost &amp; time)</label>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn" id="generateBtn" data-tip="Solve seeds for the requested count and generate scenarios, three at a time."><span class="material-symbols-rounded">bolt</span>Generate scenarios</button>
+      <button class="btn ghost" id="suggestBtn" data-tip="Ask the model which 3 additions would unlock the most genuinely new scenarios."><span class="material-symbols-rounded">tips_and_updates</span>Suggest additions</button>
+      <button class="btn ghost" id="resetAllBtn" data-tip="Reset every pill in every section back to allowed."><span class="material-symbols-rounded">refresh</span>Reset all</button>
+    </div>
+    <div class="suggest-panel" id="suggestPanel" style="display:none;"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2><span class="material-symbols-rounded">dashboard</span>Scenarios</h2>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div id="savedScenariosControl"></div>
+        <button class="iconbtn" id="importScenarioBtn" data-tip="Import a scenario, including its full branch tree, from a previously exported file." style="width:30px;height:30px;color:var(--ink-soft);border-color:var(--line-strong);background:var(--surface-2);">
+          <span class="material-symbols-rounded" style="font-size:17px">upload_file</span>
+        </button>
+        <input type="file" id="importScenarioFile" accept="application/json,.json" class="vis-hidden">
+      </div>
+    </div>
+    <div class="cards" id="cardsContainer"><div class="empty-state">No scenarios yet. Set your brief above and click Generate, or use the import icon above to load a saved one.</div></div>
+    <div class="export-row">
+      <button class="btn ghost" id="exportMdBtn" data-tip="Export every scenario's currently displayed version, storyboard, and applied refinements as Markdown."><span class="material-symbols-rounded">description</span>Export Markdown</button>
+      <button class="btn ghost" id="exportCsvBtn" data-tip="Export every scenario's currently displayed version as CSV."><span class="material-symbols-rounded">table_view</span>Export CSV</button>
+    </div>
+  </section>
+
+  </div>
+</div>
+<script>
+/* ============================= DATA ============================= */
+const PERSONAL_DEVICES = [
+ {id:'galaxy-s',name:'Galaxy S phone',icon:'smartphone',group:'personal',caps:['display','camera','mic','speaker','biometric']},
+ {id:'z-fold',name:'Z Fold',icon:'unfold_more',group:'personal',caps:['display','camera','mic','speaker','biometric','pen-input']},
+ {id:'z-flip',name:'Z Flip',icon:'flip',group:'personal',caps:['display','camera','mic','speaker','biometric']},
+ {id:'tab-s',name:'Tab S',icon:'tablet',group:'personal',caps:['display','camera','mic','speaker','pen-input']},
+ {id:'galaxy-book',name:'Galaxy Book',icon:'laptop_mac',group:'personal',caps:['display','camera','mic','speaker','biometric']},
+ {id:'galaxy-watch',name:'Galaxy Watch',icon:'watch',group:'personal',caps:['display','on-body','biometric','always-on','speaker','mic']},
+ {id:'galaxy-ring',name:'Galaxy Ring',icon:'radio_button_unchecked',group:'personal',caps:['on-body','biometric','always-on']},
+ {id:'galaxy-buds',name:'Galaxy Buds',icon:'headphones',group:'personal',caps:['mic','speaker','on-body']},
+ {id:'galaxy-xr',name:'Galaxy XR headset',icon:'view_in_ar',group:'personal',caps:['display','camera','mic','speaker','on-body']},
+ {id:'smart-glasses',name:'Smart glasses',icon:'eyeglasses',group:'personal',caps:['display','camera','mic','speaker','on-body','always-on']},
+];
+const HOME_DEVICES = [
+ {id:'family-hub',name:'Family Hub fridge',icon:'kitchen',group:'home',caps:['display','camera','always-on','room-fixed']},
+ {id:'bespoke-oven',name:'Bespoke AI oven',icon:'countertops',group:'home',caps:['heat-source','room-fixed','sensor']},
+ {id:'induction-cooktop',name:'Induction cooktop',icon:'local_fire_department',group:'home',caps:['heat-source','room-fixed']},
+ {id:'dishwasher',name:'Dishwasher',icon:'wash',group:'home',caps:['water-line','room-fixed']},
+ {id:'bespoke-washer',name:'Bespoke AI washer',icon:'local_laundry_service',group:'home',caps:['water-line','room-fixed']},
+ {id:'dryer',name:'Dryer',icon:'dry_cleaning',group:'home',caps:['heat-source','room-fixed']},
+ {id:'airdresser',name:'AirDresser',icon:'checkroom',group:'home',caps:['air-handling','room-fixed']},
+ {id:'jetbot',name:'Jet Bot robot vacuum',icon:'smart_toy',group:'home',caps:['camera','sensor','actuator']},
+ {id:'air-purifier',name:'Air purifier',icon:'air',group:'home',caps:['air-handling','room-fixed','sensor']},
+ {id:'air-conditioner',name:'Air conditioner',icon:'ac_unit',group:'home',caps:['air-handling','room-fixed','heat-source']},
+ {id:'neo-tv',name:'Neo QLED TV',icon:'tv',group:'home',caps:['display','speaker','room-fixed']},
+ {id:'the-frame',name:'The Frame',icon:'imagesmode',group:'home',caps:['display','room-fixed']},
+ {id:'soundbar',name:'Soundbar',icon:'speaker',group:'home',caps:['speaker','room-fixed']},
+ {id:'freestyle',name:'Freestyle projector',icon:'videocam',group:'home',caps:['display','speaker']},
+ {id:'smartthings-hub',name:'SmartThings hub',icon:'hub',group:'home',caps:['always-on','room-fixed','connectivity']},
+ {id:'motion-sensor',name:'Motion/door sensor',icon:'sensors',group:'home',caps:['sensor','always-on','room-fixed']},
+ {id:'home-camera',name:'Home camera',icon:'camera_indoor',group:'home',caps:['camera','always-on','room-fixed']},
+ {id:'video-doorbell',name:'Video doorbell',icon:'doorbell',group:'home',caps:['camera','mic','speaker','always-on','room-fixed']},
+ {id:'smart-plug',name:'Smart plug',icon:'power',group:'home',caps:['actuator','room-fixed','always-on']},
+ {id:'energy-monitor',name:'Energy monitor',icon:'bolt',group:'home',caps:['sensor','always-on','room-fixed']},
+ {id:'ballie',name:'Ballie home robot',icon:'sports_baseball',group:'home',caps:['camera','mic','speaker','display','actuator']},
+ {id:'st-car',name:'SmartThings-ready car',icon:'directions_car',group:'home',caps:['display','mic','speaker','sensor','actuator']},
+];
+const ALL_DEVICES = [...PERSONAL_DEVICES, ...HOME_DEVICES];
+
+const APPS_FIRST_PARTY = [
+ {id:'smartthings',name:'SmartThings',icon:'hub',group:'firstparty',domains:['device control','automation']},
+ {id:'samsung-health',name:'Samsung Health',icon:'favorite',group:'firstparty',domains:['fitness','sleep','vitals']},
+ {id:'calendar',name:'Calendar',icon:'calendar_month',group:'firstparty',domains:['calendar']},
+ {id:'reminder',name:'Reminder',icon:'notifications',group:'firstparty',domains:['tasks']},
+ {id:'notes',name:'Notes',icon:'note',group:'firstparty',domains:['notes']},
+ {id:'gallery',name:'Gallery',icon:'photo_library',group:'firstparty',domains:['photos']},
+ {id:'camera-app',name:'Camera',icon:'photo_camera',group:'firstparty',domains:['photos','video']},
+ {id:'wallet',name:'Wallet',icon:'account_balance_wallet',group:'firstparty',domains:['payments','tickets']},
+ {id:'messages',name:'Messages',icon:'sms',group:'firstparty',domains:['messaging']},
+ {id:'phone',name:'Phone',icon:'call',group:'firstparty',domains:['calls']},
+ {id:'bixby',name:'Bixby',icon:'mic',group:'firstparty',domains:['voice control']},
+ {id:'modes-routines',name:'Modes & Routines',icon:'switch_access_shortcut',group:'firstparty',domains:['automation']},
+ {id:'find',name:'Find',icon:'my_location',group:'firstparty',domains:['location']},
+ {id:'quick-share',name:'Quick Share',icon:'share',group:'firstparty',domains:['file transfer']},
+ {id:'dex',name:'DeX',icon:'desktop_windows',group:'firstparty',domains:['productivity']},
+ {id:'internet',name:'Internet',icon:'public',group:'firstparty',domains:['browsing']},
+ {id:'my-files',name:'My Files',icon:'folder',group:'firstparty',domains:['files']},
+ {id:'clock',name:'Clock',icon:'schedule',group:'firstparty',domains:['alarms','timers']},
+ {id:'tv-plus',name:'TV Plus',icon:'live_tv',group:'firstparty',domains:['media']},
+ {id:'kids',name:'Kids',icon:'child_care',group:'firstparty',domains:['parental controls']},
+];
+const APPS_GALAXY_AI = [
+ {id:'now-brief',name:'Now Brief',icon:'auto_awesome',group:'galaxyai',domains:['calendar','notifications','weather']},
+ {id:'writing-assist',name:'Writing Assist',icon:'edit_note',group:'galaxyai',domains:['messages','notes']},
+ {id:'note-assist',name:'Note Assist',icon:'summarize',group:'galaxyai',domains:['notes']},
+ {id:'photo-assist',name:'Photo Assist',icon:'auto_fix_high',group:'galaxyai',domains:['photos']},
+ {id:'live-translate',name:'Live Translate',icon:'translate',group:'galaxyai',domains:['calls','messages']},
+ {id:'interpreter',name:'Interpreter',icon:'record_voice_over',group:'galaxyai',domains:['speech']},
+ {id:'audio-eraser',name:'Audio Eraser',icon:'noise_control_off',group:'galaxyai',domains:['video']},
+ {id:'transcript-assist',name:'Transcript Assist',icon:'subject',group:'galaxyai',domains:['calls','recordings']},
+ {id:'sketch-to-image',name:'Sketch to Image',icon:'draw',group:'galaxyai',domains:['photos']},
+ {id:'browsing-assist',name:'Browsing Assist',icon:'travel_explore',group:'galaxyai',domains:['browsing']},
+];
+const APPS_GOOGLE = [
+ {id:'gemini',name:'Gemini',icon:'diamond',group:'google',domains:['assistant']},
+ {id:'circle-to-search',name:'Circle to Search',icon:'target',group:'google',domains:['search']},
+ {id:'maps',name:'Maps',icon:'map',group:'google',domains:['location','navigation']},
+ {id:'gmail',name:'Gmail',icon:'mail',group:'google',domains:['email']},
+ {id:'drive',name:'Drive',icon:'cloud',group:'google',domains:['files']},
+ {id:'meet',name:'Meet',icon:'video_call',group:'google',domains:['video calls']},
+ {id:'youtube',name:'YouTube',icon:'smart_display',group:'google',domains:['media']},
+ {id:'google-wallet',name:'Google Wallet',icon:'wallet',group:'google',domains:['payments']},
+ {id:'keep',name:'Keep',icon:'push_pin',group:'google',domains:['notes']},
+ {id:'google-home',name:'Google Home',icon:'home',group:'google',domains:['device control']},
+ {id:'google-fit',name:'Google Fit',icon:'fitness_center',group:'google',domains:['fitness']},
+];
+const ALL_APPS_BASE = [...APPS_FIRST_PARTY, ...APPS_GALAXY_AI];
+
+const DOMAINS = [
+ {id:'morning-evening',name:'Morning/evening routines',icon:'wb_twilight'},
+ {id:'meals-nutrition',name:'Meals & nutrition',icon:'restaurant'},
+ {id:'groceries-pantry',name:'Groceries & pantry',icon:'shopping_basket'},
+ {id:'cooking',name:'Cooking',icon:'skillet'},
+ {id:'cleaning',name:'Cleaning',icon:'cleaning_services'},
+ {id:'laundry-garment',name:'Laundry & garment care',icon:'local_laundry_service'},
+ {id:'home-comfort-air',name:'Home comfort & air',icon:'thermostat'},
+ {id:'energy-sustainability',name:'Energy & sustainability',icon:'eco'},
+ {id:'security-safety',name:'Security & safety',icon:'security'},
+ {id:'health-fitness',name:'Health & fitness',icon:'fitness_center'},
+ {id:'sleep',name:'Sleep',icon:'bedtime'},
+ {id:'medical-caregiving',name:'Medical & caregiving',icon:'medical_services'},
+ {id:'work-productivity',name:'Work & productivity',icon:'work'},
+ {id:'study-learning',name:'Study & learning',icon:'school'},
+ {id:'finance-payments',name:'Finance & payments',icon:'payments'},
+ {id:'shopping',name:'Shopping',icon:'shopping_cart'},
+ {id:'commute-mobility',name:'Commute & mobility',icon:'directions_transit'},
+ {id:'travel',name:'Travel',icon:'flight'},
+ {id:'entertainment-media',name:'Entertainment & media',icon:'movie'},
+ {id:'family-kids',name:'Family & kids',icon:'family_restroom'},
+ {id:'pets',name:'Pets',icon:'pets'},
+ {id:'celebrations-events',name:'Celebrations & events',icon:'celebration'},
+ {id:'photography-memories',name:'Photography & memories',icon:'photo_camera'},
+ {id:'communication',name:'Communication',icon:'chat'},
+ {id:'digital-admin-backup',name:'Digital admin & backup',icon:'backup'},
+ {id:'accessibility',name:'Accessibility',icon:'accessibility_new'},
+];
+
+const CADENCE = [
+ {id:'t0',name:'Ambient/continuous',icon:'all_inclusive',example:'Air quality is monitored the entire time anyone is home.'},
+ {id:'t1',name:'Several times a day',icon:'repeat',example:'Checking the fridge cam before each grocery run.'},
+ {id:'t2',name:'Daily',icon:'today',example:'The morning routine brief.'},
+ {id:'t3',name:'Weekly',icon:'date_range',example:'The Sunday laundry batch.'},
+ {id:'t4',name:'Monthly',icon:'calendar_view_month',example:'Reviewing the energy bill.'},
+ {id:'t5',name:'Seasonal',icon:'ac_unit',example:'Swapping the AC filter each summer.'},
+ {id:'t6',name:'Annual',icon:'cake',example:'A birthday celebration.'},
+ {id:'t7',name:'Lifetime/rare',icon:'auto_stories',example:'Moving into a new home.'},
+ {id:'t8',name:'Episodic/triggered',icon:'flash_on',example:'A doorbell ring while cooking.'},
+];
+
+const TRIGGERS = [
+ {id:'time',name:'Time',desc:'Fires at a scheduled clock time or interval.'},
+ {id:'location',name:'Location',desc:'Fires on geofence entry/exit or proximity.'},
+ {id:'sensor',name:'Sensor',desc:'Fires from a physical reading crossing a threshold.'},
+ {id:'manual',name:'Manual',desc:'Fires because someone directly asked or tapped.'},
+ {id:'inferred',name:'Inferred',desc:'Fires from a pattern the system inferred, not a rule.'},
+ {id:'social',name:'Social',desc:"Fires from another person's action or a shared plan."},
+];
+
+const LENGTH_TIERS = {
+ brief:{label:'Brief',words:60,steps:'exactly 3',extras:[],max_tokens:900},
+ standard:{label:'Standard',words:140,steps:'3-4',extras:[],max_tokens:1400},
+ detailed:{label:'Detailed',words:300,steps:'5-7',extras:['dataTouched','kpi','edgeCase'],max_tokens:2400},
+ deepdive:{label:'Deep dive',words:550,steps:'7-10',extras:['dataTouched','kpi','edgeCase','emotionalArc','crossSell'],max_tokens:3800},
+};
+
+const PERSONAS_BUILTIN = [
+ 'Working parent, two school-age kids, dual income',
+ 'Elderly parent living alone, adult child remote',
+ 'Recent graduate, first apartment, budget-conscious',
+ 'Multigenerational household, three generations under one roof',
+ 'Frequent business traveler, minimal time at home',
+ 'College student, shared dorm/apartment',
+ 'New parent, infant at home, sleep-deprived',
+ 'Remote-first freelancer, home is also the office',
+ 'Empty nesters, health-conscious retirees',
+ 'Couple with pets, no kids, both full-time jobs',
+];
+
+const REGIONS = ['India','South Korea','United States','Germany','United Kingdom','Brazil','Indonesia','UAE','Japan','Global/region-neutral'];
+const FEASIBILITY = ['Ships today','Near-future','Speculative'];
+
+// Provider adapter config. Claude can run pre-authenticated inside Claude's own environment
+// (no key needed there); Gemini always needs a key supplied in the header field, since there's
+// no equivalent pre-authenticated path for it. Model IDs drift, these are current stable
+// defaults as of this build and may need updating later.
+const PROVIDERS = {
+  claude: { label: 'Claude', model: 'claude-sonnet-4-6', needsKeyAlways: false },
+  gemini: { label: 'Gemini', model: 'gemini-3.6-flash', needsKeyAlways: true },
+};
+
+/* ============================= STORAGE WRAPPER ============================= */
+const memStore = {};
+// window.storage (Claude's environment) is tried first and always wins when present.
+// Outside that environment, localStorage lets saved briefs/scenarios/settings actually
+// survive a reload, which matters once this file is hosted standalone rather than run
+// inside Claude. Some contexts (private browsing, certain sandboxed iframes) can still throw
+// on localStorage access, so it's feature-detected and an in-memory map is the final fallback.
+function detectLocalStorage(){
+  try{
+    const k='__sf_probe__';
+    window.localStorage.setItem(k,'1');
+    window.localStorage.removeItem(k);
+    return true;
+  }catch(e){ return false; }
+}
+const hasLocalStorage = (typeof window !== 'undefined' && window.localStorage) ? detectLocalStorage() : false;
+function nsKey(key, shared){ return 'sf:'+(shared?'shared:':'p:')+key; }
+const Store = {
+  async get(key, shared=false){
+    if(window.storage && typeof window.storage.get==='function'){
+      try{ const r = await window.storage.get(key, shared); return r ? r.value : null; }catch(e){ /* fall through */ }
+    }
+    if(hasLocalStorage){
+      try{ return window.localStorage.getItem(nsKey(key, shared)); }catch(e){}
+    }
+    const k=(shared?'shared:':'p:')+key;
+    return Object.prototype.hasOwnProperty.call(memStore,k) ? memStore[k] : null;
+  },
+  async set(key, value, shared=false){
+    if(window.storage && typeof window.storage.set==='function'){
+      try{ return await window.storage.set(key, value, shared); }catch(e){ /* fall through */ }
+    }
+    if(hasLocalStorage){
+      try{ window.localStorage.setItem(nsKey(key, shared), value); return {key,value,shared}; }catch(e){}
+    }
+    const k=(shared?'shared:':'p:')+key; memStore[k]=value; return {key,value,shared};
+  },
+  async delete(key, shared=false){
+    if(window.storage && typeof window.storage.delete==='function'){
+      try{ return await window.storage.delete(key, shared); }catch(e){}
+    }
+    if(hasLocalStorage){
+      try{ window.localStorage.removeItem(nsKey(key, shared)); return {key,deleted:true,shared}; }catch(e){}
+    }
+    const k=(shared?'shared:':'p:')+key; delete memStore[k]; return {key,deleted:true,shared};
+  },
+  async list(prefix='', shared=false){
+    if(window.storage && typeof window.storage.list==='function'){
+      try{ const r = await window.storage.list(prefix, shared); return r ? r.keys : []; }catch(e){}
+    }
+    if(hasLocalStorage){
+      try{
+        const ns = nsKey('', shared);
+        const full = ns+prefix;
+        const keys = [];
+        for(let i=0;i<window.localStorage.length;i++){
+          const k = window.localStorage.key(i);
+          if(k && k.startsWith(full)) keys.push(k.slice(ns.length));
+        }
+        return keys;
+      }catch(e){}
+    }
+    const pfx=(shared?'shared:':'p:')+prefix;
+    return Object.keys(memStore).filter(k=>k.startsWith(pfx)).map(k=>k.slice(shared?7:2));
+  }
+};
+
+/* ============================= TOOLTIP ENGINE ============================= */
+const tooltipEl = document.getElementById('tooltip');
+let tooltipAnchor = null;
+function showTooltip(target, text){
+  if(!text) return;
+  tooltipAnchor = target;
+  tooltipEl.textContent = text;
+  tooltipEl.classList.add('show');
+  positionTooltip(target);
+}
+function positionTooltip(target){
+  if(!target || !tooltipEl.classList.contains('show')) return;
+  const r = target.getBoundingClientRect();
+  let top = r.top - tooltipEl.offsetHeight - 8;
+  let left = r.left + r.width/2 - tooltipEl.offsetWidth/2;
+  if(top < 4) top = r.bottom + 8;
+  if(left < 4) left = 4;
+  if(left + tooltipEl.offsetWidth > window.innerWidth - 4) left = window.innerWidth - tooltipEl.offsetWidth - 4;
+  tooltipEl.style.top = top+'px';
+  tooltipEl.style.left = left+'px';
+}
+function hideTooltip(){
+  tooltipEl.classList.remove('show');
+  tooltipAnchor = null;
+}
+function tipTextFor(el){
+  return el.getAttribute('data-tip-live') || el.getAttribute('data-tip');
+}
+document.addEventListener('mouseover', e=>{
+  const el = e.target.closest('[data-tip],[data-tip-live]');
+  if(el) showTooltip(el, tipTextFor(el));
+});
+document.addEventListener('mouseout', e=>{
+  const el = e.target.closest('[data-tip],[data-tip-live]');
+  if(el && (!e.relatedTarget || !el.contains(e.relatedTarget))) hideTooltip();
+});
+document.addEventListener('focusin', e=>{
+  const el = e.target.closest('[data-tip],[data-tip-live]');
+  if(el) showTooltip(el, tipTextFor(el));
+});
+document.addEventListener('focusout', e=>{
+  const el = e.target.closest('[data-tip],[data-tip-live]');
+  if(el) hideTooltip();
+});
+window.addEventListener('scroll', ()=>positionTooltip(tooltipAnchor), true);
+window.addEventListener('resize', ()=>positionTooltip(tooltipAnchor));
+function clearTooltipIfInside(container){
+  if(tooltipAnchor && container.contains(tooltipAnchor)) hideTooltip();
+}
+
+/* ============================= TOAST (non-blocking, no native modals) ============================= */
+let toastEl = null;
+function showToast(msg, ms=4200){
+  if(!toastEl){
+    toastEl = document.createElement('div');
+    toastEl.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9998;background:var(--brand);color:var(--brand-ink);font-size:12.5px;line-height:1.4;border-radius:10px;padding:10px 16px;box-shadow:var(--shadow);max-width:380px;text-align:center;transition:opacity .15s ease;';
+    document.body.appendChild(toastEl);
+  }
+  toastEl.textContent = msg;
+  toastEl.style.opacity = '1';
+  clearTimeout(toastEl._t);
+  toastEl._t = setTimeout(()=>{ toastEl.style.opacity='0'; }, ms);
+}
+
+/* ============================= APP STATE ============================= */
+const State = {
+  devices: [...ALL_DEVICES.map(d=>({...d,caps:[...d.caps]}))],
+  apps: [...ALL_APPS_BASE],
+  googleIncluded: false,
+  domains: [...DOMAINS],
+  cadence: [...CADENCE],
+  pillState: { personal:{}, home:{}, apps:{}, domains:{}, cadence:{} },
+  customPersonas: [],
+  persona: PERSONAS_BUILTIN[0],
+  region: REGIONS[0],
+  feasibility: FEASIBILITY[1],
+  length: 'standard',
+  count: 3,
+  refinementPass: false,
+  provider: 'gemini',
+  seeds: [],
+  scenarios: [], // {id, seed, versions:[...], currentVersionIndex, busy, opId, instructions:[], excludedDeviceIds:[], addedDeviceIds:[]}
+  scenarioCounter: 0,
+  cardsPage: 0,
+};
+
+function initPillStates(){
+  PERSONAL_DEVICES.forEach(d=> State.pillState.personal[d.id]='allowed');
+  HOME_DEVICES.forEach(d=> State.pillState.home[d.id]='allowed');
+  ALL_APPS_BASE.forEach(a=> State.pillState.apps[a.id]='allowed');
+  DOMAINS.forEach(d=> State.pillState.domains[d.id]='allowed');
+  CADENCE.forEach(c=> State.pillState.cadence[c.id]='allowed');
+}
+initPillStates();
+
+function cyclePill(section, id){
+  const cur = State.pillState[section][id] || 'allowed';
+  const next = cur==='allowed' ? 'required' : cur==='required' ? 'excluded' : 'allowed';
+  State.pillState[section][id] = next;
+}
+function nextStateLabel(cur){
+  return cur==='allowed' ? 'required' : cur==='required' ? 'excluded' : 'allowed';
+}
+
+/* ============================= RENDER: PILLS ============================= */
+function deviceTooltip(d, state){
+  const custom = d.id.startsWith('custom-');
+  const capStr = d.caps.length ? d.caps.join(', ') : (custom ? 'unclassified, use the pencil icon to edit' : 'none');
+  return `${d.name}, capabilities: ${capStr}. Click to make ${nextStateLabel(state)}.`;
+}
+function genericTooltip(label, desc, state){
+  return `${label}${desc?', '+desc:''}. Click to make ${nextStateLabel(state)}.`;
+}
+
+// The pencil icon only appears on custom (user-added) pills, since built-ins already have a
+// fixed, correct tag set. editFn receives (item, anchorEl) and owns opening whatever editor fits.
+function renderPillSection(containerId, items, section, tipFn, editFn){
+  const el = document.getElementById(containerId);
+  clearTooltipIfInside(el);
+  el.innerHTML = '';
+  items.forEach(item=>{
+    const state = State.pillState[section][item.id] || 'allowed';
+    const pill = document.createElement('button');
+    pill.className = 'pill';
+    pill.type = 'button';
+    pill.setAttribute('data-state', state);
+    pill.setAttribute('data-id', item.id);
+    pill.setAttribute('data-tip-live', tipFn(item, state));
+    pill.innerHTML = `<span class="material-symbols-rounded">${item.icon}</span>${item.name}`;
+    pill.addEventListener('click', ()=>{
+      cyclePill(section, item.id);
+      renderAll();
+    });
+    if(editFn && item.id.startsWith('custom-')){
+      const wrap = document.createElement('span');
+      wrap.className = 'pill-wrap';
+      wrap.appendChild(pill);
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'pill-edit-btn';
+      editBtn.setAttribute('data-tip', "Edit this custom entry's tags.");
+      editBtn.innerHTML = '<span class="material-symbols-rounded">edit</span>';
+      editBtn.addEventListener('click', (e)=>{ e.stopPropagation(); editFn(item, editBtn); });
+      wrap.appendChild(editBtn);
+      el.appendChild(wrap);
+    } else {
+      el.appendChild(pill);
+    }
+  });
+}
+
+/* ============================= CUSTOM ENTRY TAG EDITOR ============================= */
+// Fixed vocabulary the generation prompts and brief-check logic actually understand.
+// Devices are constrained to this set so a custom device behaves like a real one instead
+// of silently having zero capabilities forever.
+const CAPABILITY_TAGS = ['display','camera','mic','speaker','room-fixed','always-on','biometric','water-line','heat-source','air-handling','on-body','pen-input','sensor','actuator','connectivity'];
+
+let openEditorPopover = null;
+function handleOutsideEditorClick(e){
+  if(openEditorPopover && !openEditorPopover.contains(e.target)) closeEditorPopover();
+}
+function handleEditorEscape(e){
+  if(e.key==='Escape') closeEditorPopover();
+}
+function closeEditorPopover(){
+  if(openEditorPopover && openEditorPopover.parentNode) openEditorPopover.parentNode.removeChild(openEditorPopover);
+  openEditorPopover = null;
+  document.removeEventListener('click', handleOutsideEditorClick, true);
+  document.removeEventListener('keydown', handleEditorEscape, true);
+}
+function positionPopover(popover, anchorEl){
+  popover.style.visibility = 'hidden';
+  document.body.appendChild(popover);
+  const r = anchorEl.getBoundingClientRect();
+  let top = r.bottom + 6;
+  let left = r.left;
+  const pw = popover.offsetWidth, ph = popover.offsetHeight;
+  if(left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+  if(left < 8) left = 8;
+  if(top + ph > window.innerHeight - 8) top = r.top - ph - 6;
+  if(top < 8) top = 8;
+  popover.style.top = top+'px';
+  popover.style.left = left+'px';
+  popover.style.visibility = 'visible';
+}
+function openCapabilityEditor(device, anchorEl){
+  closeEditorPopover();
+  hideTooltip();
+  const popover = document.createElement('div');
+  popover.className = 'tag-editor-popover';
+  popover.innerHTML = `
+    <div class="tag-editor-title">Capabilities: ${device.name}</div>
+    <div class="tag-editor-hint">Only checked capabilities will ever be used in generated scenarios for this device.</div>
+    <div class="tag-editor-list">${CAPABILITY_TAGS.map(tag=>`<label class="tag-check"><input type="checkbox" value="${tag}" ${device.caps.includes(tag)?'checked':''}>${tag}</label>`).join('')}</div>
+    <div class="tag-editor-actions">
+      <button class="cardbtn" data-cancel>Cancel</button>
+      <button class="cardbtn violet" data-save>Save</button>
+    </div>`;
+  positionPopover(popover, anchorEl);
+  popover.querySelector('[data-cancel]').addEventListener('click', closeEditorPopover);
+  popover.querySelector('[data-save]').addEventListener('click', ()=>{
+    device.caps = Array.from(popover.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value);
+    closeEditorPopover();
+    renderAll();
+    showToast(`Updated capabilities for "${device.name}".`);
+  });
+  openEditorPopover = popover;
+  setTimeout(()=>{
+    document.addEventListener('click', handleOutsideEditorClick, true);
+    document.addEventListener('keydown', handleEditorEscape, true);
+  }, 0);
+}
+function openDomainEditor(app, anchorEl){
+  closeEditorPopover();
+  hideTooltip();
+  const popover = document.createElement('div');
+  popover.className = 'tag-editor-popover';
+  popover.innerHTML = `
+    <div class="tag-editor-title">Data domains: ${app.name}</div>
+    <div class="tag-editor-hint">Comma-separated, e.g. calendar, payments, photos.</div>
+    <input type="text" class="tag-editor-input" value="${app.domains.join(', ')}">
+    <div class="tag-editor-actions">
+      <button class="cardbtn" data-cancel>Cancel</button>
+      <button class="cardbtn violet" data-save>Save</button>
+    </div>`;
+  positionPopover(popover, anchorEl);
+  popover.querySelector('[data-cancel]').addEventListener('click', closeEditorPopover);
+  popover.querySelector('[data-save]').addEventListener('click', ()=>{
+    const raw = popover.querySelector('.tag-editor-input').value;
+    app.domains = raw.split(',').map(s=>s.trim()).filter(Boolean);
+    closeEditorPopover();
+    renderAll();
+    showToast(`Updated data domains for "${app.name}".`);
+  });
+  openEditorPopover = popover;
+  setTimeout(()=>{
+    document.addEventListener('click', handleOutsideEditorClick, true);
+    document.addEventListener('keydown', handleEditorEscape, true);
+  }, 0);
+}
+
+function currentApps(){
+  return State.googleIncluded ? [...State.apps, ...APPS_GOOGLE] : State.apps;
+}
+
+function renderPills(){
+  renderPillSection('personalGrid', State.devices.filter(d=>d.group==='personal'), 'personal', (d,s)=>deviceTooltip(d,s), openCapabilityEditor);
+  renderPillSection('homeGrid', State.devices.filter(d=>d.group==='home'), 'home', (d,s)=>deviceTooltip(d,s), openCapabilityEditor);
+  renderPillSection('appsGrid', currentApps(), 'apps', (a,s)=>genericTooltip(a.name, 'touches: '+(a.domains.length? a.domains.join(', ') : (a.id.startsWith('custom-')?'unclassified, use the pencil icon to edit':'none')), s), openDomainEditor);
+  renderPillSection('domainsGrid', State.domains, 'domains', (d,s)=>genericTooltip(d.name, null, s));
+  renderPillSection('cadenceGrid', State.cadence, 'cadence', (c,s)=>genericTooltip(c.name, c.example, s));
+}
+
+document.querySelectorAll('[data-reset]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const sec = btn.getAttribute('data-reset');
+    Object.keys(State.pillState[sec]).forEach(id=> State.pillState[sec][id]='allowed');
+    renderAll();
+  });
+});
+document.querySelectorAll('[data-exclude-all]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const sec = btn.getAttribute('data-exclude-all');
+    Object.keys(State.pillState[sec]).forEach(id=> State.pillState[sec][id]='excluded');
+    renderAll();
+  });
+});
+document.getElementById('resetAllBtn').addEventListener('click', ()=>{
+  ['personal','home','apps','domains','cadence'].forEach(sec=>{
+    Object.keys(State.pillState[sec]).forEach(id=> State.pillState[sec][id]='allowed');
+  });
+  renderAll();
+});
+
+document.getElementById('googleToggle').addEventListener('click', (e)=>{
+  State.googleIncluded = !State.googleIncluded;
+  e.currentTarget.setAttribute('aria-checked', String(State.googleIncluded));
+  if(State.googleIncluded){ APPS_GOOGLE.forEach(a=>{ if(!(a.id in State.pillState.apps)) State.pillState.apps[a.id]='allowed'; }); }
+  renderAll();
+});
+
+// An add button only looks and behaves clickable once its paired text field has content;
+// otherwise it stays dim and inert, so it never reads as "broken" when there's nothing to add.
+function wireAddRow(inputId, btnId){
+  const input = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  const sync = ()=>{ btn.disabled = input.value.trim()===''; };
+  input.addEventListener('input', sync);
+  sync();
+}
+function addCustomDevice(inputId, btnId, group){
+  const input = document.getElementById(inputId);
+  const name = input.value.trim();
+  if(!name) return;
+  const id = 'custom-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')+'-'+Date.now().toString(36);
+  const dev = {id, name, icon:'device_unknown', group, caps:[]};
+  State.devices.push(dev);
+  State.pillState[group][id]='required';
+  input.value='';
+  document.getElementById(btnId).disabled = true;
+  renderAll();
+  showToast(`Added "${name}" as required. Its capability tags start unclassified, use the pencil icon on the pill to select which capabilities it has.`);
+}
+document.getElementById('personalAddBtn').addEventListener('click', ()=> addCustomDevice('personalAddInput', 'personalAddBtn', 'personal'));
+document.getElementById('homeAddBtn').addEventListener('click', ()=> addCustomDevice('homeAddInput', 'homeAddBtn', 'home'));
+document.getElementById('appsAddBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('appsAddInput');
+  const name = input.value.trim();
+  if(!name) return;
+  const id = 'custom-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')+'-'+Date.now().toString(36);
+  const app = {id, name, icon:'apps', group:'custom', domains:[]};
+  State.apps.push(app);
+  State.pillState.apps[id]='required';
+  input.value='';
+  document.getElementById('appsAddBtn').disabled = true;
+  renderAll();
+  showToast(`Added "${name}" as required. Its data domains start unclassified, use the pencil icon on the pill to add them.`);
+});
+document.getElementById('domainAddBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('domainAddInput');
+  const name = input.value.trim();
+  if(!name) return;
+  const id = 'custom-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')+'-'+Date.now().toString(36);
+  const dom = {id, name, icon:'star'};
+  State.domains.push(dom);
+  State.pillState.domains[id]='required';
+  input.value='';
+  document.getElementById('domainAddBtn').disabled = true;
+  renderAll();
+});
+wireAddRow('personalAddInput','personalAddBtn');
+wireAddRow('homeAddInput','homeAddBtn');
+wireAddRow('appsAddInput','appsAddBtn');
+wireAddRow('domainAddInput','domainAddBtn');
+
+
+/* ============================= RENDER: CONFIG ============================= */
+function populateSelect(sel, values, selected){
+  sel.innerHTML='';
+  values.forEach(v=>{
+    const opt=document.createElement('option'); opt.value=v; opt.textContent=v;
+    if(v===selected) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+function renderConfig(){
+  const personaSel = document.getElementById('personaSelect');
+  populateSelect(personaSel, [...PERSONAS_BUILTIN, ...State.customPersonas], State.persona);
+  populateSelect(document.getElementById('regionSelect'), REGIONS, State.region);
+  populateSelect(document.getElementById('feasibilitySelect'), FEASIBILITY, State.feasibility);
+
+  const lengthSel = document.getElementById('lengthSelect');
+  const lengthOptionsHtml = Object.entries(LENGTH_TIERS).map(([key,tier])=>
+    `<option value="${key}" ${State.length===key?'selected':''}>${tier.label} (~${tier.words} words)</option>`
+  ).join('');
+  if(lengthSel.innerHTML !== lengthOptionsHtml) lengthSel.innerHTML = lengthOptionsHtml;
+  lengthSel.value = State.length;
+  const activeTier = LENGTH_TIERS[State.length];
+  lengthSel.setAttribute('data-tip-live', `${activeTier.label}: ~${activeTier.words} words, ${activeTier.steps} steps.${activeTier.extras.length?' Adds: '+activeTier.extras.join(', ')+'.':''}`);
+
+  document.getElementById('countVal').textContent = State.count;
+}
+document.getElementById('lengthSelect').addEventListener('change', e=>{ State.length = e.target.value; renderConfig(); });
+document.getElementById('personaSelect').addEventListener('change', e=> State.persona = e.target.value);
+document.getElementById('regionSelect').addEventListener('change', e=> State.region = e.target.value);
+document.getElementById('feasibilitySelect').addEventListener('change', e=> State.feasibility = e.target.value);
+document.getElementById('countRange').addEventListener('input', e=>{
+  State.count = parseInt(e.target.value,10);
+  document.getElementById('countVal').textContent = State.count;
+  renderMatrixMetrics();
+});
+document.getElementById('refineToggle').addEventListener('change', e=> State.refinementPass = e.target.checked);
+document.getElementById('personaAddBtn').addEventListener('click', async ()=>{
+  const input = document.getElementById('personaAddInput');
+  const val = input.value.trim();
+  if(!val) return;
+  State.customPersonas.push(val);
+  State.persona = val;
+  input.value='';
+  await Store.set('custom-personas', JSON.stringify(State.customPersonas));
+  renderConfig();
+});
+
+/* ============================= BRIEF VALIDATION ============================= */
+function requiredIds(sec){ return Object.entries(State.pillState[sec]).filter(([,v])=>v==='required').map(([k])=>k); }
+function allowedIds(sec){ return Object.entries(State.pillState[sec]).filter(([,v])=>v==='allowed').map(([k])=>k); }
+function excludedIds(sec){ return Object.entries(State.pillState[sec]).filter(([,v])=>v==='excluded').map(([k])=>k); }
+
+function getDeviceById(id){ return State.devices.find(d=>d.id===id); }
+
+function runBriefCheck(){
+  const warnings = [];
+  const reqPersonal = requiredIds('personal');
+  const reqHome = requiredIds('home');
+  const reqDevices = [...reqPersonal, ...reqHome];
+  const reqDomains = requiredIds('domains');
+  const reqCadence = requiredIds('cadence');
+  const allowedPersonal = allowedIds('personal');
+  const allowedHome = allowedIds('home');
+  const excludedPersonal = new Set(excludedIds('personal'));
+  const excludedHome = new Set(excludedIds('home'));
+
+  if(reqDevices.length===0) warnings.push('No required device. Every scenario will use whatever the solver happens to sample.');
+  if(reqDomains.length===0) warnings.push('No required domain. The seed solver will roam freely across all allowed domains.');
+  if(reqCadence.length===0) warnings.push('No required cadence tier, cadence will vary scenario to scenario.');
+  if(reqDevices.length>4) warnings.push('More than 4 required devices. Scenarios start to feel contrived when too many devices are forced into every one.');
+
+  const displayCapable = new Set(['display']);
+  const inPlayDevices = [...reqDevices, ...allowedPersonal, ...allowedHome];
+  const hasDisplay = inPlayDevices.some(id=>{ const d=getDeviceById(id); return d && d.caps.includes('display'); });
+  if(!hasDisplay) warnings.push('No display-capable device anywhere in required and allowed. Scenarios that need to show information may struggle.');
+
+  const roomFixedRequired = reqDevices.some(id=>{ const d=getDeviceById(id); return d && d.caps.includes('room-fixed'); });
+  const travelDomainRequired = reqDomains.some(id=> id==='commute-mobility' || id==='travel');
+  if(roomFixedRequired && travelDomainRequired) warnings.push('A room-fixed appliance is required alongside commute/travel domains. That pairing is physically awkward.');
+
+  const ambientCadenceRequired = reqCadence.includes('t0');
+  const hasAlwaysOn = inPlayDevices.some(id=>{ const d=getDeviceById(id); return d && d.caps.includes('always-on'); });
+  if(ambientCadenceRequired && !hasAlwaysOn) warnings.push('Ambient/continuous cadence is required but no always-on device is in play.');
+
+  const cap = computeCapacity();
+  if(State.count > cap) warnings.push(`Requested scenario count (${State.count}) exceeds the brief's estimated solvable capacity (${cap}). Expect repeats or fewer unique scenarios than requested.`);
+
+  const el = document.getElementById('briefCheck');
+  el.innerHTML='';
+  if(warnings.length===0){
+    const line=document.createElement('div');
+    line.className='checkline ok';
+    line.innerHTML=`<span class="material-symbols-rounded">check_circle</span> Brief looks coherent. No warnings.`;
+    el.appendChild(line);
+  } else {
+    warnings.forEach(w=>{
+      const line=document.createElement('div');
+      line.className='checkline';
+      line.innerHTML=`<span class="material-symbols-rounded">warning</span> ${w}`;
+      el.appendChild(line);
+    });
+  }
+  return warnings;
+}
+
+/* ============================= SEED SOLVER ============================= */
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function choose(arr,n){ return shuffle(arr).slice(0,n); }
+function nCr(n,r){ if(r<0||r>n) return 0; r=Math.min(r,n-r); let res=1; for(let i=0;i<r;i++) res=res*(n-i)/(i+1); return Math.round(res); }
+
+function inPlayDomains(){ return State.domains.filter(d=> (State.pillState.domains[d.id]||'allowed') !== 'excluded'); }
+function inPlayCadence(){ return State.cadence.filter(c=> (State.pillState.cadence[c.id]||'allowed') !== 'excluded'); }
+function requiredDeviceObjs(){ return [...requiredIds('personal'), ...requiredIds('home')].map(getDeviceById).filter(Boolean); }
+function allowedDeviceObjs(){ return [...allowedIds('personal'), ...allowedIds('home')].map(getDeviceById).filter(Boolean); }
+
+function sampleRoomFor(reqCount){
+  if(reqCount<=1) return 2;
+  if(reqCount<=3) return 1;
+  return 0;
+}
+
+function computeCapacity(){
+  const domains = inPlayDomains();
+  const cadences = inPlayCadence();
+  if(domains.length===0 || cadences.length===0) return 0;
+  const req = requiredDeviceObjs();
+  const allowed = allowedDeviceObjs();
+  const room = sampleRoomFor(req.length);
+  let variety = 1;
+  if(room>0 && allowed.length>0){
+    variety = 0;
+    for(let k=0;k<=room;k++) variety += nCr(allowed.length,k);
+    variety = Math.max(1, Math.min(variety, 24));
+  }
+  const triggers = TRIGGERS.length;
+  const raw = domains.length * triggers * variety;
+  return Math.max(0, Math.min(raw, 500));
+}
+
+function buildDeviceSet(){
+  const req = requiredDeviceObjs();
+  const allowed = allowedDeviceObjs();
+  const room = sampleRoomFor(req.length);
+  const n = room>0 ? Math.floor(Math.random()*(room+1)) : 0;
+  const sampled = choose(allowed, n);
+  const set = [...req, ...sampled];
+  const seen = new Set(); const dedup=[];
+  set.forEach(d=>{ if(!seen.has(d.id)){ seen.add(d.id); dedup.push(d); } });
+  return dedup;
+}
+
+function deviceSetSig(devs){ return devs.map(d=>d.id).sort().join('+'); }
+
+function solveSeeds(n){
+  const domains = inPlayDomains();
+  const cadences = inPlayCadence();
+  const triggers = TRIGGERS;
+  if(domains.length===0 || cadences.length===0){ return []; }
+  const seeds = [];
+  const used = new Set();
+  const domainCycle = shuffle(domains);
+  const triggerCycle = shuffle(triggers);
+  const cadenceCycle = shuffle(cadences);
+  // Domain is the fastest-varying axis, so a small requested count (e.g. the default of 3)
+  // still spreads across that many distinct domains before ever repeating one, rather than
+  // exhausting every trigger on a single domain first. Trigger varies next-fastest, cadence
+  // slowest, since domain diversity matters most for a brief with nothing required.
+  let attempt = 0;
+  let guard = 0;
+  const maxGuard = n*40 + 200;
+  while(seeds.length < n && guard < maxGuard){
+    guard++;
+    const domain = domainCycle[attempt % domainCycle.length];
+    const trigger = triggerCycle[Math.floor(attempt / domainCycle.length) % triggerCycle.length];
+    const cadence = cadenceCycle[Math.floor(attempt / (domainCycle.length*triggerCycle.length)) % cadenceCycle.length];
+    const devSet = buildDeviceSet();
+    const key = deviceSetSig(devSet)+'::'+domain.id+'::'+trigger.id;
+    if(!used.has(key)){
+      used.add(key);
+      seeds.push({
+        id: 'seed-'+seeds.length+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+        domain, trigger, cadence, devices: devSet,
+      });
+    }
+    attempt++;
+  }
+  return seeds;
+}
+
+/* ============================= MATRIX + METRICS ============================= */
+function renderMatrixMetrics(){
+  const cap = computeCapacity();
+  const reqTotal = ['personal','home','apps','domains','cadence'].reduce((s,sec)=> s+requiredIds(sec).length, 0);
+  document.getElementById('metricRequired').textContent = reqTotal;
+  document.getElementById('metricCapacity').textContent = cap;
+  document.getElementById('metricGenerated').textContent = State.scenarios.length;
+  document.getElementById('metricBranches').textContent = totalBranchPathsAcrossAllScenarios();
+  const coverage = State.seeds.length ? Math.round(100*State.scenarios.filter(s=>s.versions.length>0).length / State.seeds.length) : 0;
+  document.getElementById('metricCoverage').textContent = coverage+'%';
+
+  const table = document.getElementById('seedMatrix');
+  const domains = inPlayDomains();
+  table.innerHTML='';
+  if(domains.length===0){ table.innerHTML = '<tr><td style="border:none;background:transparent;color:var(--ink-faint);font-size:12px;">No domains in play.</td></tr>'; return; }
+  const thead = document.createElement('tr');
+  thead.innerHTML = '<th></th>'+TRIGGERS.map(t=>`<th data-tip="${t.desc}">${t.name}</th>`).join('');
+  table.appendChild(thead);
+  domains.forEach(dom=>{
+    const tr = document.createElement('tr');
+    const th = document.createElement('td');
+    th.className='rowlabel'; th.style.border='none'; th.style.background='transparent';
+    th.innerHTML = `<span class="material-symbols-rounded" style="font-size:15px;vertical-align:-3px;color:var(--accent)">${dom.icon}</span> ${dom.name}`;
+    tr.appendChild(th);
+    TRIGGERS.forEach(trig=>{
+      const td = document.createElement('td');
+      const seedsHere = State.seeds.filter(s=> s.domain.id===dom.id && s.trigger.id===trig.id);
+      let status = 'empty';
+      if(seedsHere.length){
+        const writtenCount = seedsHere.filter(s=> State.scenarios.some(sc=> sc.seed.id===s.id && sc.versions.length>0)).length;
+        status = writtenCount>0 ? 'written' : 'claimed';
+      }
+      td.className = status==='written' ? 'written' : status==='claimed' ? 'claimed' : '';
+      td.setAttribute('data-tip', `${dom.name} × ${trig.name}: ${status==='written'?'scenario written':status==='claimed'?'seed claimed, not yet written':'unclaimed'}`);
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+}
+
+/* ============================= API CALL ============================= */
+// Provider adapter: builds the right request shape and parses the right response shape for
+// whichever provider is selected. Claude can run pre-authenticated inside Claude's own
+// environment with no key; every other path (Gemini always, Claude outside that environment)
+// requires the key entered in the header field.
+// If you've deployed the companion Cloudflare Worker proxy (see /proxy/README.md),
+// paste its URL here so visitors can generate without ever needing their own key.
+// Leave blank to require a key from whoever opens this page (the original behavior).
+const PROXY_URL = 'https://scenario-forge-proxy.somsam-testing.workers.dev'; // e.g. 'https://scenario-forge-proxy.you.workers.dev'
+
+function extractGeminiText(data){
+  const candidate = (data.candidates||[])[0];
+  const text = candidate ? (candidate.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('') : '';
+  if(!text && candidate && candidate.finishReason==='MAX_TOKENS'){
+    throw new Error('Gemini used its whole token budget on internal reasoning before writing an answer. Try a shorter length tier or try again.');
+  }
+  return text;
+}
+function extractClaudeText(data){
+  return (data.content||[]).map(b=> b.type==='text' ? b.text : '').join('\n');
+}
+
+// Different sources produce different error shapes: our own worker returns a plain
+// { error: "string" }, while a passed-through Claude failure looks like
+// { type:"error", error:{ type, message } } and a passed-through Gemini failure looks
+// like { error:{ code, message, status } }. Blindly using data.error broke when it was
+// an object, producing "[object Object]" instead of the real message.
+function extractErrorMessage(data, fallback){
+  if(!data) return fallback;
+  if(typeof data.error === 'string') return data.error;
+  if(data.error && typeof data.error.message === 'string') return data.error.message;
+  if(typeof data.message === 'string') return data.message;
+  return fallback;
+}
+
+async function callModel(prompt, max_tokens){
+  const provider = State.provider || 'gemini';
+  const apiKey = ''; // manual key entry removed; this page always uses the shared proxy
+  const cfg = PROVIDERS[provider];
+
+  // Route through the shared proxy when one is configured and the visitor hasn't
+  // typed their own key, a typed key always means "use my own account directly."
+  if(PROXY_URL && !apiKey){
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider, model: cfg.model, prompt, maxTokens: max_tokens }),
+    });
+    const data = await res.json();
+    if(!res.ok){ throw new Error(extractErrorMessage(data, 'Proxy error '+res.status)); }
+    return provider==='gemini' ? extractGeminiText(data) : extractClaudeText(data);
+  }
+
+  if(provider === 'gemini'){
+    if(!apiKey) throw new Error('Gemini requires an API key. Add yours in the header field, then try again.');
+    // Gemini 3.x models think by default, and reasoning text can land in the same parts array
+    // as the real answer, flagged with "thought": true. Some models don't fully honor
+    // includeThoughts:false, so parts are also filtered client-side, and a token buffer is
+    // added since thinking tokens can eat into the requested output budget before any answer
+    // text is produced.
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${cfg.model}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          maxOutputTokens: max_tokens + 2048,
+          responseMimeType: 'application/json',
+          thinkingConfig: { includeThoughts: false },
+        },
+      }),
+    });
+    if(!res.ok){ const errData = await res.json().catch(()=>null); throw new Error(extractErrorMessage(errData, 'Gemini API error '+res.status)); }
+    const data = await res.json();
+    return extractGeminiText(data);
+  }
+
+  // Claude
+  const headers = { 'Content-Type':'application/json' };
+  if(apiKey){ headers['x-api-key']=apiKey; headers['anthropic-dangerous-direct-browser-access']='true'; headers['anthropic-version']='2023-06-01'; }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST', headers,
+    body: JSON.stringify({ model:cfg.model, max_tokens, messages:[{role:'user', content: prompt}] })
+  });
+  if(!res.ok){ const errData = await res.json().catch(()=>null); throw new Error(extractErrorMessage(errData, 'Claude API error '+res.status)); }
+  const data = await res.json();
+  return extractClaudeText(data);
+}
+
+// Models occasionally emit near-JSON: literal newlines/tabs inside string values (breaks the
+// grammar with "Unterminated string" / "Expected ',' or ']'"), or a lone unescaped quote inside
+// a string. This walks the text tracking string/escape state and repairs what it safely can.
+function sanitizeJsonControlChars(str){
+  let out = '';
+  let inString = false;
+  let escapeNext = false;
+  for(let i=0;i<str.length;i++){
+    const ch = str[i];
+    if(escapeNext){ out+=ch; escapeNext=false; continue; }
+    if(ch === '\\' && inString){ out+=ch; escapeNext=true; continue; }
+    if(ch === '"'){ inString = !inString; out+=ch; continue; }
+    if(inString){
+      if(ch === '\n'){ out += '\\n'; continue; }
+      if(ch === '\r'){ continue; }
+      if(ch === '\t'){ out += '\\t'; continue; }
+    }
+    out += ch;
+  }
+  return out;
+}
+function stripTrailingCommas(str){
+  return str.replace(/,\s*([}\]])/g, '$1');
+}
+// The UI numbers flow steps itself; some models still prefix step text with their own
+// "1.", "2)", etc, which then doubles up with our number (rendering as "1.1", "2.2").
+// Strip a leading enumeration marker if present.
+function stripLeadingStepNumber(s){
+  if(typeof s !== 'string') return s;
+  return s.replace(/^\s*\(?\d{1,2}\)?[\.\):]\s+/, '').trim();
+}
+function parseJsonLoose(text){
+  let t = text.trim();
+  t = t.replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  const first = t.indexOf('{'); const last = t.lastIndexOf('}');
+  if(first>=0 && last>first) t = t.slice(first,last+1);
+  try{
+    return JSON.parse(t);
+  }catch(e1){
+    try{
+      return JSON.parse(stripTrailingCommas(sanitizeJsonControlChars(t)));
+    }catch(e2){
+      const err = new Error('Model response was not valid JSON ('+e2.message+')');
+      err.raw = text;
+      throw err;
+    }
+  }
+}
+// Calls the selected model expecting strict JSON back; if parsing fails (malformed JSON from
+// the model), automatically retries with the parse error fed back so the model can self-correct.
+async function callModelJson(prompt, max_tokens, attempts=2){
+  let lastErr, currentPrompt = prompt;
+  for(let i=0;i<attempts;i++){
+    const text = await callModel(currentPrompt, max_tokens);
+    try{
+      return { text, parsed: parseJsonLoose(text) };
+    }catch(e){
+      lastErr = e;
+      currentPrompt = prompt + `\n\nYour previous response could not be parsed as JSON (error: ${e.message}). Respond again with ONLY valid, strict JSON: escape every double quote inside a string value as \\", escape every line break inside a string value as \\n, use no trailing commas, and include no markdown fences or commentary before or after the JSON object.`;
+    }
+  }
+  throw lastErr;
+}
+
+/* ============================= PROMPT BUILDERS ============================= */
+function buildScenarioPrompt(seed, tier, instructions, excludedDeviceIds){
+  const devices = seed.devices.filter(d=> !excludedDeviceIds.includes(d.id));
+  const deviceLines = devices.map(d=> `- ${d.name} (id: ${d.id}), capabilities: ${d.caps.length? d.caps.join(', '):'none classified, treat as capability-free'}`).join('\n');
+  const appsInPlay = [...requiredIds('apps'), ...allowedIds('apps')].map(id=> currentApps().find(a=>a.id===id)).filter(Boolean);
+  const appLines = appsInPlay.map(a=> `- ${a.name}, touches: ${a.domains.join(', ')}`).join('\n');
+  const extras = tier.extras;
+  const extraFieldsStr = extras.length ? `Also include these extra JSON fields: ${extras.join(', ')}.` : 'Do not include any extra fields beyond the base schema.';
+  const instrBlock = instructions.length ? `\nApply these cumulative refinement instructions from the strategist, in order:\n${instructions.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n` : '';
+
+  return `You are writing ONE product-strategy use-case scenario for a Samsung Galaxy ecosystem use-case generator called Scenario Forge.
+
+LANGUAGE: Write the entire response in English only, every field, every word. This applies regardless of the region below: even when the region is Germany, Japan, South Korea, Brazil, etc., write in English and only borrow local proper nouns (place names, festival names, brand names) as English-alphabet text embedded in English sentences. Do not switch the narrative, steps, or any other field into the region's language.
+
+DEVICE SET (use ONLY these devices, and ONLY the capabilities listed for each, never invent a capability a device does not have):
+${deviceLines || '(no devices, this scenario must work through apps/services alone)'}
+
+APPS IN PLAY (use only apps from this list where relevant, referencing the data domain they touch):
+${appLines}
+
+SPEC:
+- Domain/activity: ${seed.domain.name}
+- Cadence tier: ${seed.cadence.name} (example real-world cadence: ${seed.cadence.example})
+- Trigger type: ${seed.trigger.name} (${seed.trigger.desc})
+- Persona: ${State.persona}
+- Region: ${State.region}, be concrete and region-accurate: real place names, real prices in local currency, real festivals/holidays, real weather/season for this region, described in English. Never say "the user", name the persona naturally instead.
+- Feasibility bar: ${State.feasibility}
+- Length tier: ${tier.label}, target about ${tier.words} words for the narrative, and ${tier.steps} numbered flow steps.
+${instrBlock}
+RULES:
+(a) Be concrete: real times, prices, festivals, weather for the region. Never write "the user."
+(b) Invent no capability outside the device list above.
+(c) Explicitly and honestly explain why the scenario needs more than one device, or admit if it doesn't need multiple devices.
+(d) Avoid marketing language such as "seamlessly," "effortlessly," "magically."
+(e) Write each entry in "steps" as plain instruction text with no leading number, bullet, or "Step N" prefix, the interface numbers steps automatically.
+(f) English only, in every field, regardless of region.
+(g) Never use an em dash or a double hyphen anywhere in the response. Write plain sentences using commas, periods, colons, or parentheses instead.
+${extraFieldsStr}
+
+Respond with STRICT JSON only, no markdown code fences, no commentary before or after. Every string value must be valid JSON: escape any double quote inside it as \\", write any line break inside it as \\n (never a literal line break), and do not use trailing commas. Schema:
+{
+  "title": string,
+  "narrative": string,
+  "trigger": string,
+  "devices": [ { "name": string, "role": "initiator"|"sensor"|"display"|"actuator"|"companion" } ],
+  "apps": [string],
+  "steps": [string],
+  "jobToBeDone": string,
+  "userValue": string,
+  "multiDeviceValue": string,
+  "friction": string,
+  "feasibility": "Ships today"|"Near-future"|"Speculative",
+  "privacy": string${extras.length? ',\n  '+extras.map(e=>`"${e}": ${e==='dataTouched'?'[string]':'string'}`).join(',\n  '):''}
+}`;
+}
+
+function buildStoryboardPrompt(scenario){
+  return `Turn this product-strategy scenario into a camera-ready storyboard prompt package for an image/video generation tool. Ground every environment in ${State.region}: real interiors, real clutter, lived-in spaces. Never render any device as a hero product shot on white. Write everything in English, regardless of region, do not switch language. Never use an em dash or a double hyphen anywhere in the response, write plain sentences using commas, periods, colons, or parentheses instead.
+
+SCENARIO:
+Title: ${scenario.title}
+Narrative: ${scenario.narrative}
+Devices: ${(scenario.devices||[]).map(d=>d.name+' ('+d.role+')').join(', ')}
+Region: ${State.region}
+Persona: ${State.persona}
+
+Respond with STRICT JSON only, no markdown fences. Every string value must be valid JSON: escape any double quote inside it as \\", write any line break inside it as \\n (never a literal line break), and do not use trailing commas. Schema:
+{
+  "styleBlock": string (one sentence: film stock / palette / grade),
+  "aspectRatio": string,
+  "castConsistencyNote": string,
+  "panels": [
+    { "beat": "setup"|"trigger"|"action"|"payoff"|"closing", "shotType": string, "cameraPrompt": string (40-60 words, describe only what a camera sees, never what a person thinks), "devicesVisible": string, "lighting": string, "onScreenText": string }
+  ],
+  "videoPrompt": string (60-90 words, one continuous shot covering the whole sequence)
+}`;
+}
+
+function buildSuggestPrompt(){
+  const reqDev = [...requiredIds('personal'),...requiredIds('home')].map(getDeviceById).filter(Boolean).map(d=>d.name);
+  const allowedDev = [...allowedIds('personal'),...allowedIds('home')].map(getDeviceById).filter(Boolean).map(d=>d.name);
+  const reqDom = requiredIds('domains').map(id=> State.domains.find(d=>d.id===id)?.name).filter(Boolean);
+  const allowedDom = allowedIds('domains').map(id=> State.domains.find(d=>d.id===id)?.name).filter(Boolean);
+  return `Given this Samsung Galaxy ecosystem scenario-generation brief:
+Required devices: ${reqDev.join(', ')||'none'}
+Allowed device pool: ${allowedDev.join(', ')||'none'}
+Required domains: ${reqDom.join(', ')||'none'}
+Allowed domain pool: ${allowedDom.join(', ')||'none'}
+
+Which 3 additions (each either one device or one domain, from realistic Samsung Galaxy ecosystem options, not necessarily limited to the pool above) would unlock the most genuinely NEW scenario territory, not the most impressive-sounding ones? Briefly explain what each unlocks in 1-2 sentences. Write entirely in English. Never use an em dash or a double hyphen anywhere in the response, write plain sentences using commas, periods, colons, or parentheses instead.
+
+Respond with STRICT JSON only, no markdown fences. Every string value must be valid JSON: escape any double quote inside it as \\" and write any line break inside it as \\n (never a literal line break):
+{ "suggestions": [ { "addition": string, "type": "device"|"domain", "unlocks": string } ] }`;
+}
+
+/* ============================= WORKER POOL GENERATION ============================= */
+async function runPool(items, worker, concurrency=3){
+  let idx=0;
+  async function next(){
+    while(idx<items.length){
+      const i = idx++;
+      await worker(items[i], i);
+    }
+  }
+  const runners = Array.from({length:Math.min(concurrency, items.length)}, ()=>next());
+  await Promise.all(runners);
+}
+
+function newScenarioShell(seed){
+  State.scenarioCounter++;
+  return {
+    id: 'card-'+State.scenarioCounter,
+    seed,
+    versions: [],
+    currentVersionIndex: -1,
+    busy: false,
+    opId: 0,
+    instructions: [],
+    excludedDeviceIds: [],
+    addedDeviceIds: [],
+  };
+}
+
+async function generateVersionForCard(card, extraNote){
+  const opId = ++card.opId;
+  card.busy = true;
+  card.statusText = extraNote || 'Generating…';
+  renderCards();
+  try{
+    const tier = LENGTH_TIERS[State.length];
+    const prompt = buildScenarioPrompt(card.seed, tier, card.instructions, card.excludedDeviceIds);
+    const { parsed: parsedRaw } = await callModelJson(prompt, tier.max_tokens);
+    if(opId !== card.opId) return; // soft-cancelled
+    let parsed = parsedRaw;
+    if(Array.isArray(parsed.devices)){
+      parsed.devices = parsed.devices.filter(d=>{
+        const nameLower = (d.name||'').toLowerCase();
+        return !card.excludedDeviceIds.some(exId=>{
+          const dev = getDeviceById(exId);
+          return dev && nameLower.includes(dev.name.toLowerCase());
+        });
+      });
+    }
+    if(Array.isArray(parsed.steps)) parsed.steps = parsed.steps.map(stripLeadingStepNumber);
+    let version = { ...parsed, storyboard:null, ts: Date.now() };
+    if(State.refinementPass){
+      card.statusText = 'Refining against rubric…';
+      renderCards();
+      const critiquePrompt = `Critique and rewrite the following scenario JSON against this 5-point rubric: (1) regional believability, (2) real device jobs matching their listed capabilities, (3) honest cadence, (4) no invented capability, (5) no sales language. Write entirely in English, regardless of the scenario's region, do not switch language. Never use an em dash or a double hyphen anywhere in the response, write plain sentences using commas, periods, colons, or parentheses instead. Return the IMPROVED scenario as STRICT JSON only, no markdown fences, same schema as input. Escape every double quote inside a string value as \\" and every line break inside a string value as \\n.\n\nSCENARIO JSON:\n${JSON.stringify(parsed)}`;
+      const { parsed: parsed2 } = await callModelJson(critiquePrompt, Math.round(tier.max_tokens*1.3));
+      if(opId !== card.opId) return;
+      if(Array.isArray(parsed2.steps)) parsed2.steps = parsed2.steps.map(stripLeadingStepNumber);
+      version = { ...parsed2, storyboard:null, ts: Date.now() };
+    }
+    card.versions.push(version);
+    card.currentVersionIndex = card.versions.length-1;
+  }catch(err){
+    if(opId !== card.opId) return;
+    card.versions.push({ title:'Generation failed', narrative:String(err.message||err), steps:[], devices:[], apps:[], error:true, ts:Date.now() });
+    card.currentVersionIndex = card.versions.length-1;
+  }finally{
+    if(opId === card.opId){ card.busy = false; card.statusText=''; }
+    syncAfterBranchChange(card);
+    renderMatrixMetrics();
+  }
+}
+
+document.getElementById('generateBtn').addEventListener('click', async ()=>{
+  runBriefCheck();
+  const n = State.count;
+  const seeds = solveSeeds(n);
+  State.seeds = [...State.seeds, ...seeds];
+  const newCards = seeds.map(newScenarioShell);
+  State.scenarios = [...State.scenarios, ...newCards];
+  State.cardsPage = Math.max(0, Math.ceil(State.scenarios.length / CARDS_PER_PAGE) - 1);
+  renderCards(); renderMatrixMetrics();
+  await runPool(newCards, (card)=> generateVersionForCard(card), 3);
+});
+
+document.getElementById('suggestBtn').addEventListener('click', async ()=>{
+  const panel = document.getElementById('suggestPanel');
+  panel.style.display='block';
+  panel.innerHTML = '<div class="status-strip"><span class="spin"></span> Thinking about what would unlock new territory…</div>';
+  try{
+    const { parsed } = await callModelJson(buildSuggestPrompt(), 700);
+    panel.innerHTML='';
+    (parsed.suggestions||[]).forEach(s=>{
+      const div = document.createElement('div');
+      div.className='suggest-item';
+      div.innerHTML = `<b>${s.addition} <span style="opacity:.7;font-weight:500;">(${s.type})</span></b>${s.unlocks}`;
+      panel.appendChild(div);
+    });
+  }catch(err){
+    panel.innerHTML = `<div class="checkline"><span class="material-symbols-rounded">error</span> Could not get suggestions: ${err.message}</div>`;
+  }
+});
+
+/* ============================= REFINE: KEYWORD SYNC ============================= */
+const STOPWORDS = new Set(['galaxy','smart','the','a','an','device']);
+function tokenize(str){ return str.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w && !STOPWORDS.has(w)); }
+const REMOVE_VERBS = ['remove','exclude','drop','without','no more'];
+const ADD_VERBS = ['add','include','use','bring back','with'];
+
+function applyKeywordSync(card, instruction){
+  const lower = instruction.toLowerCase();
+  const words = tokenize(instruction);
+  const removeIntent = REMOVE_VERBS.some(v=> lower.includes(v));
+  const addIntent = ADD_VERBS.some(v=> lower.includes(v));
+  ALL_DEVICES.forEach(dev=>{
+    const devTokens = tokenize(dev.name);
+    const matches = devTokens.length>0 && devTokens.every(t=> words.includes(t));
+    if(!matches) return;
+    if(removeIntent){
+      if(!card.excludedDeviceIds.includes(dev.id)) card.excludedDeviceIds.push(dev.id);
+      card.addedDeviceIds = card.addedDeviceIds.filter(id=>id!==dev.id);
+    } else if(addIntent){
+      if(!card.addedDeviceIds.includes(dev.id)) card.addedDeviceIds.push(dev.id);
+      card.excludedDeviceIds = card.excludedDeviceIds.filter(id=>id!==dev.id);
+      if(!card.seed.devices.some(d=>d.id===dev.id)) card.seed.devices.push(dev);
+    }
+  });
+}
+
+/* ============================= CARD RENDERING ============================= */
+function currentVersion(card){ return card.versions[card.currentVersionIndex]; }
+
+/* ============================= BRANCHING ============================= */
+// Suggested default path count per trigger type, sensor/time/location forks tend to be
+// binary (something happens or it doesn't); manual/inferred/social forks tend to support
+// more genuinely distinct real options. Only used to seed the form's default, never a hard cap.
+const TRIGGER_BRANCH_HINTS = { time:2, location:2, sensor:2, manual:4, inferred:3, social:3 };
+const BRANCH_MAX_DEPTH = 2; // a path can itself be branched once more, no further
+
+function ensureBranchesObj(node){ if(!node.branches) node.branches = {}; return node.branches; }
+
+// A pointer is a flat array [stepIndex, pathIndex, stepIndex, pathIndex, ...] locating a node
+// (either the root version or a nested path) inside a version's branch tree. Depth = pointer.length/2.
+function getBranchNode(version, pointer){
+  let node = version;
+  for(let i=0;i<pointer.length;i+=2){
+    const stepIdx = pointer[i], pathIdx = pointer[i+1];
+    if(!node.branches || !node.branches[stepIdx] || !node.branches[stepIdx].paths[pathIdx]) return null;
+    node = node.branches[stepIdx].paths[pathIdx];
+  }
+  return node;
+}
+function countBranchPaths(node){
+  if(!node || !node.branches) return 0;
+  let c=0;
+  Object.values(node.branches).forEach(bg=>{
+    c += bg.paths.length;
+    bg.paths.forEach(p=> c += countBranchPaths(p));
+  });
+  return c;
+}
+function countForkGroups(node){
+  if(!node || !node.branches) return 0;
+  let c = Object.keys(node.branches).length;
+  Object.values(node.branches).forEach(bg=> bg.paths.forEach(p=> c += countForkGroups(p)));
+  return c;
+}
+function totalBranchPathsAcrossAllScenarios(){
+  let total = 0;
+  State.scenarios.forEach(card=> card.versions.forEach(v=> total += countBranchPaths(v)));
+  return total;
+}
+
+function buildBranchPrompt(card, trunkSteps, forkStepText, count, premiseHint){
+  const devices = card.seed.devices.filter(d=> !card.excludedDeviceIds.includes(d.id));
+  const deviceLines = devices.map(d=> `- ${d.name}, capabilities: ${d.caps.length? d.caps.join(', '):'none classified, treat as capability-free'}`).join('\n');
+  return `You are branching ONE existing product-strategy scenario at a specific step, to show genuinely different ways it could pan out from there, not rewordings of the same outcome.
+
+SHARED TRUNK (fixed, do not rewrite any of this, every branch continues from exactly here):
+${trunkSteps.map((s,i)=>`${i+1}. ${s}`).join('\n')}
+
+DEVICE SET (use only these devices, and only the capabilities listed for each):
+${deviceLines || '(no devices, work through apps/services alone)'}
+
+Fork point: step ${trunkSteps.length} ("${forkStepText}").
+${premiseHint ? `Strategist's premise hint for the branches: ${premiseHint}\n` : ''}
+Generate up to ${count} genuinely different continuations from this point onward, each diverging in outcome or friction, not just tone or wording. If you cannot make ${count} honestly distinct continuations, return fewer rather than padding with cosmetic variants. Number continuation steps starting at ${trunkSteps.length+1}.
+
+Rules: (a) stay strictly within the device/capability list above; (b) be concrete, real times, prices, reactions, never "the user"; (c) avoid marketing language such as "seamlessly" or "effortlessly"; (d) write each continuation step as plain text with no leading number, the interface numbers steps automatically; (e) write everything in English, regardless of region, do not switch language; (f) never use an em dash or a double hyphen anywhere in the response, write plain sentences using commas, periods, colons, or parentheses instead.
+
+Respond with STRICT JSON only, no markdown fences. Every string value must be valid JSON: escape quotes as \\" and line breaks as \\n, no trailing commas. Schema:
+{ "paths": [ { "label": string (2-4 words, e.g. "Answers immediately"), "premise": string (one sentence describing this branch's premise), "steps": [string] (continuation steps only, not the trunk) } ] }`;
+}
+
+async function generateBranches(card, pointer, stepIndex, count, premiseHint){
+  const version = currentVersion(card);
+  if(!version) return;
+  const node = getBranchNode(version, pointer);
+  if(!node || !node.steps) return;
+  const trunkSteps = node.steps.slice(0, stepIndex+1);
+  const forkStepText = node.steps[stepIndex];
+  card.busy = true; card.statusText = 'Generating branches…';
+  renderCards();
+  try{
+    const prompt = buildBranchPrompt(card, trunkSteps, forkStepText, count, premiseHint);
+    const { parsed } = await callModelJson(prompt, 900);
+    const rawPaths = (parsed.paths||[]).slice(0, count);
+    const paths = rawPaths.map((p,idx)=>({ label: p.label || ('Path '+String.fromCharCode(65+idx)), premise: p.premise||'', steps: (Array.isArray(p.steps)?p.steps:[]).map(stripLeadingStepNumber) }));
+    if(paths.length===0){
+      showToast('The model could not produce honestly distinct branches from this step.');
+    } else {
+      ensureBranchesObj(node)[stepIndex] = { paths, active: 0, premiseHint };
+    }
+  }catch(err){
+    showToast('Branch generation failed: '+err.message);
+  }
+  card.busy=false; card.statusText='';
+  syncAfterBranchChange(card);
+  renderMatrixMetrics();
+}
+
+// Renders the step list for a node, splicing in branch panels and recursing into the active
+// path's continuation once a step has been forked. counterRef.n is a running step number shared
+// across the whole recursive render so numbering stays continuous through branches.
+function renderStepsBranchHtml(card, version, pointer, counterRef){
+  const node = getBranchNode(version, pointer);
+  if(!node || !node.steps) return '';
+  const depth = pointer.length/2;
+  const canBranch = depth < BRANCH_MAX_DEPTH;
+  const steps = node.steps;
+  let html = '';
+  for(let i=0;i<steps.length;i++){
+    counterRef.n++;
+    html += `<div class="step-row"><span class="step-num">${counterRef.n}.</span><span class="step-text">${steps[i]}</span>`;
+    if(canBranch){
+      html += `<button class="branch-btn" data-action="branch-step" data-pointer='${JSON.stringify(pointer)}' data-step-index="${i}" data-tip="Branch: show alternate ways this could pan out from here."><span class="material-symbols-rounded">call_split</span></button>`;
+    }
+    html += `</div>`;
+    if(node.branches && node.branches[i]){
+      const bg = node.branches[i];
+      html += `<div class="branch-panel">`;
+      html += `<div class="segmented mini">`;
+      bg.paths.forEach((p,pi)=>{
+        html += `<button data-action="select-path" data-pointer='${JSON.stringify(pointer)}' data-step-index="${i}" data-path-index="${pi}" aria-pressed="${pi===bg.active}" data-tip="Show this branch's continuation.">${p.label}</button>`;
+      });
+      html += `</div>`;
+      const activePath = bg.paths[bg.active];
+      if(activePath && activePath.premise) html += `<div class="branch-premise">${activePath.premise}</div>`;
+      html += `</div>`;
+      if(activePath){
+        html += renderStepsBranchHtml(card, version, [...pointer, i, bg.active], counterRef);
+      }
+      break; // remaining trunk steps after the fork are superseded by the active path
+    }
+  }
+  return html;
+}
+
+// Renders one node's own step list (numbered continuously via counterBase) plus, if that node
+// has been forked, ALL of its paths as sibling boxes (unlike the card view, which only descends
+// into the active path), so the tree shows the whole shape of the story, not just one thread.
+function renderTreeNode(card, pointer, node, counterBase){
+  const depth = pointer.length/2;
+  const canBranch = depth < BRANCH_MAX_DEPTH;
+  const steps = node.steps || [];
+  let html = '<div class="steps-custom">';
+  let num = counterBase;
+  let forkedAt = -1;
+  for(let i=0;i<steps.length;i++){
+    num++;
+    html += `<div class="step-row"><span class="step-num">${num}.</span><span class="step-text">${steps[i]}</span>`;
+    if(canBranch){
+      html += `<button class="branch-btn" data-action="branch-step" data-pointer='${JSON.stringify(pointer)}' data-step-index="${i}" data-tip="Branch from this step."><span class="material-symbols-rounded">call_split</span></button>`;
+    }
+    html += `</div>`;
+    if(node.branches && node.branches[i]){ forkedAt = i; break; }
+  }
+  html += '</div>';
+  const endCount = counterBase + (forkedAt>=0 ? forkedAt+1 : steps.length);
+  if(forkedAt>=0){
+    const bg = node.branches[forkedAt];
+    html += `<div class="tree-children"><div class="tree-fork"><div class="tree-forklabel">Fork at step ${endCount}</div><div class="tree-paths">`;
+    bg.paths.forEach((p,pi)=>{
+      const childPointer = [...pointer, forkedAt, pi];
+      const childHtml = renderTreeNode(card, childPointer, p, endCount);
+      html += `<div class="tree-branch">
+        <div class="tree-node path${pi===bg.active?' active':''}" data-action="select-path" data-pointer='${JSON.stringify(pointer)}' data-step-index="${forkedAt}" data-path-index="${pi}" data-tip="${pi===bg.active?'Currently the active path on the card.':'Make this the active path on the card.'}">
+          <div class="tree-node-title">${p.label}</div>
+          ${p.premise?`<div class="tree-premise">${p.premise}</div>`:''}
+        </div>
+        ${childHtml}
+      </div>`;
+    });
+    html += `</div></div></div>`;
+  }
+  return html;
+}
+function renderTreeHtml(card, version){
+  const stepsHtml = renderTreeNode(card, [], version, 0);
+  return `<div class="tree-root">
+    <div class="tree-node root">
+      <div class="tree-node-title">${version.title||'Scenario'}</div>
+      ${version.narrative?`<div class="tree-narrative">${version.narrative}</div>`:''}
+    </div>
+    ${stepsHtml}
+    <div class="tree-branch-slot" data-open="0"></div>
+  </div>`;
+}
+
+// Only one tree modal is open at a time; tracking it lets branch generation and path
+// selection, whether triggered from the card or from inside the modal, refresh whichever
+// surfaces are currently visible, so the card and the modal never show stale/mismatched state.
+let openTreeModalState = null; // { card, backdropEl, bodyEl }
+function wireTreeModalActions(card, bodyEl){
+  bodyEl.querySelectorAll('[data-action]').forEach(el=>{
+    const action = el.getAttribute('data-action');
+    el.addEventListener('click', ()=> handleTreeAction(card, action, bodyEl, el));
+  });
+}
+function refreshTreeModalBody(){
+  if(!openTreeModalState) return;
+  const { card, bodyEl, backdropEl } = openTreeModalState;
+  const v = currentVersion(card);
+  if(!v){ closeTreeModal(); return; }
+  const scrollTop = bodyEl.scrollTop;
+  const titleEl = backdropEl.querySelector('.tree-modal-title');
+  if(titleEl) titleEl.textContent = 'Branch tree: '+(v.title||'');
+  bodyEl.innerHTML = renderTreeHtml(card, v);
+  wireTreeModalActions(card, bodyEl);
+  bodyEl.scrollTop = scrollTop;
+}
+function closeTreeModal(){
+  if(openTreeModalState && openTreeModalState.backdropEl && openTreeModalState.backdropEl.parentNode){
+    openTreeModalState.backdropEl.parentNode.removeChild(openTreeModalState.backdropEl);
+  }
+  openTreeModalState = null;
+}
+function openTreeModal(card){
+  const v = currentVersion(card); if(!v) return;
+  closeTreeModal(); // only one tree modal open at a time
+  const backdrop = document.createElement('div');
+  backdrop.className='tree-modal-backdrop';
+  backdrop.innerHTML = `<div class="tree-modal">
+    <div class="tree-modal-head">
+      <strong class="tree-modal-title" style="font-size:13px;">Branch tree: ${v.title||''}</strong>
+      <button class="iconbtn" data-close data-tip="Close" style="width:28px;height:28px;color:var(--ink-soft);border-color:var(--line-strong);background:var(--surface-2);"><span class="material-symbols-rounded" style="font-size:16px">close</span></button>
+    </div>
+    <div class="tree-modal-body"></div>
+  </div>`;
+  backdrop.addEventListener('click', (e)=>{ if(e.target===backdrop){ closeTreeModal(); } });
+  backdrop.querySelector('[data-close]').addEventListener('click', ()=> closeTreeModal());
+  document.body.appendChild(backdrop);
+  openTreeModalState = { card, backdropEl: backdrop, bodyEl: backdrop.querySelector('.tree-modal-body') };
+  refreshTreeModalBody();
+}
+// Any change that touches a version's branch tree, new branches, or picking a different
+// active path, needs to refresh the card grid, and also the tree modal if it's open for
+// this same card, so the two views never drift out of sync.
+function syncAfterBranchChange(card){
+  renderCards();
+  if(openTreeModalState && openTreeModalState.card === card){ refreshTreeModalBody(); }
+}
+function handleTreeAction(card, action, container, btn){
+  const version = currentVersion(card);
+  if(!version) return;
+  if(action==='select-path'){
+    const pointer = JSON.parse(btn.getAttribute('data-pointer'));
+    const stepIndex = parseInt(btn.getAttribute('data-step-index'),10);
+    const pathIndex = parseInt(btn.getAttribute('data-path-index'),10);
+    const node = getBranchNode(version, pointer);
+    if(node && node.branches && node.branches[stepIndex]) node.branches[stepIndex].active = pathIndex;
+    syncAfterBranchChange(card);
+    return;
+  }
+  if(action==='branch-step'){
+    const pointer = JSON.parse(btn.getAttribute('data-pointer'));
+    const stepIndex = parseInt(btn.getAttribute('data-step-index'),10);
+    const node = getBranchNode(version, pointer);
+    if(!node) return;
+    const stepText = node.steps[stepIndex];
+    const slot = container.querySelector('.tree-branch-slot');
+    if(!slot) return;
+    if(slot.dataset.open==='1'){ slot.innerHTML=''; slot.dataset.open='0'; return; }
+    slot.innerHTML = branchFormHtml(card, stepIndex, stepText);
+    slot.dataset.open='1';
+    slot.scrollIntoView({behavior:'smooth', block:'nearest'});
+    slot.querySelector('[data-cancel-branch]').addEventListener('click', ()=>{ slot.innerHTML=''; slot.dataset.open='0'; });
+    slot.querySelector('[data-submit-branch]').addEventListener('click', ()=>{
+      const count = Math.min(4, Math.max(2, parseInt(slot.querySelector('.branch-count').value,10) || 2));
+      const premiseHint = slot.querySelector('.branch-premise-input').value.trim();
+      slot.innerHTML=''; slot.dataset.open='0';
+      generateBranches(card, pointer, stepIndex, count, premiseHint);
+    });
+    return;
+  }
+}
+function branchFormHtml(card, stepIndex, stepText){
+  const suggested = Math.min(4, Math.max(2, TRIGGER_BRANCH_HINTS[card.seed.trigger.id] || 2));
+  return `<div class="branch-form">
+    <div style="font-size:11.5px;color:var(--ink-soft);">Branching from step ${stepIndex+1}: "${stepText}"</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <label style="font-size:11px;color:var(--ink-faint);" for="branchCountInput">Paths (2-4)</label>
+      <input type="number" min="2" max="4" value="${suggested}" id="branchCountInput" class="branch-count">
+    </div>
+    <textarea class="branch-premise-input" placeholder="Optional premise hint, e.g. what if the resident doesn't respond…" data-tip="A one-line hint steering what the branches diverge on. Leave blank to let the model choose."></textarea>
+    <div class="rowbtns">
+      <button class="cardbtn" data-cancel-branch>Cancel</button>
+      <button class="cardbtn trigger" data-submit-branch>Generate branches</button>
+    </div>
+  </div>`;
+}
+
+
+function feasClass(f){ if(!f) return 'ships'; const l=f.toLowerCase(); return l.includes('near')?'near': l.includes('spec')?'spec':'ships'; }
+
+function chip(cls, icon, label){ return `<span class="chip ${cls}"><span class="material-symbols-rounded">${icon}</span>${label}</span>`; }
+
+function renderCardEl(card, index){
+  const wrap = document.createElement('div');
+  wrap.className='card';
+  const v = currentVersion(card);
+
+  if(!v){
+    wrap.innerHTML = `<div class="card-top"><span class="idx-badge">#${index+1}</span><div class="card-title" style="color:var(--ink-faint)">Crafting scenario: ${card.seed.domain.name} × ${card.seed.trigger.name}</div></div>
+    <div class="status-strip"><span class="spin"></span>${card.statusText||'Waiting…'}</div>`;
+    return wrap;
+  }
+
+  const chips = [
+    chip('cadence','schedule',card.seed.cadence.name),
+    chip('domain',card.seed.domain.icon,card.seed.domain.name),
+    chip('trigger','flash_on',card.seed.trigger.name),
+    ...(v.devices||[]).map(d=> chip('device','memory', d.name+' · '+d.role)),
+    ...(v.apps||[]).map(a=> chip('app','apps', typeof a==='string'?a:a.name)),
+  ].join('');
+
+  const extrasHtml = Object.entries(v).filter(([k])=> ['dataTouched','kpi','edgeCase','emotionalArc','crossSell'].includes(k))
+    .map(([k,val])=> `<div class="card-section"><div class="lbl">${k}</div>${Array.isArray(val)?val.join(', '):val}</div>`).join('');
+
+  const instrHtml = card.instructions.length ? `<div class="instr-list">Refinements applied: ${card.instructions.map((s,i)=>`(${i+1}) ${s}`).join(' · ')}</div>` : '';
+
+  const INFO_FIELDS = [
+    {key:'jtbd', label:'Job to be done', value:v.jobToBeDone},
+    {key:'uservalue', label:'User value', value:v.userValue},
+    {key:'multidevice', label:'Why multi-device', value:v.multiDeviceValue},
+    {key:'friction', label:'Friction', value:v.friction},
+    {key:'privacy', label:'Privacy', value:v.privacy},
+  ];
+  const activeInfoTab = card.infoTab || 'jtbd';
+  const activeInfoField = INFO_FIELDS.find(f=>f.key===activeInfoTab) || INFO_FIELDS[0];
+  const infoTabsHtml = `<div class="card-section">
+    <div class="info-tabs">${INFO_FIELDS.map(f=>`<button data-action="info-tab" data-tab="${f.key}" aria-pressed="${f.key===activeInfoField.key}" data-tip="${f.label}">${f.label}</button>`).join('')}</div>
+    <div class="info-tab-content">${activeInfoField.value || 'Not provided by this version.'}</div>
+  </div>`;
+
+  wrap.innerHTML = `
+    <div class="card-top">
+      <span class="idx-badge">#${index+1}</span>
+      <div class="card-title">${v.title||'Untitled'}</div>
+      <span class="feas-badge ${feasClass(v.feasibility)}" data-tip="Feasibility bar for this version.">${v.feasibility||'Not set'}</span>
+    </div>
+    <div class="chiprow">${chips}</div>
+    <div class="narrative">${v.narrative||''}</div>
+    ${v.trigger?`<div class="card-section"><div class="lbl">Trigger</div>${v.trigger}</div>`:''}
+    ${(v.steps&&v.steps.length)?`<div class="card-section"><div class="lbl">Flow</div><div class="steps-custom">${renderStepsBranchHtml(card, v, [], {n:0})}</div></div>`:''}
+    ${infoTabsHtml}
+    ${extrasHtml}
+    ${instrHtml}
+    ${v.storyboard? renderStoryboardHtml(v.storyboard) : ''}
+    <div class="refine-slot"></div>
+    <div class="branch-slot" data-open="0"></div>
+    ${card.busy?`<div class="status-strip"><span class="spin"></span>${card.statusText||'Working…'} <button class="cardbtn" data-action="stop" style="margin-left:auto">Stop &amp; go back</button></div>`:''}
+    <div class="card-footer">
+      <button class="cardbtn violet" data-action="storyboard" data-tip="Turn this version into a camera-ready storyboard prompt package."><span class="material-symbols-rounded" style="font-size:14px">movie</span>Storyboard</button>
+      <button class="cardbtn" data-action="regenerate" data-tip="Fresh attempt on the same seed. Creates a new version."><span class="material-symbols-rounded" style="font-size:14px">refresh</span>Regenerate</button>
+      <button class="cardbtn" data-action="refine" data-tip="Open an inline refinement instruction box."><span class="material-symbols-rounded" style="font-size:14px">edit</span>Refine</button>
+      <button class="cardbtn" data-action="more-specific" data-tip="Preset: push for concrete names, times, and prices."><span class="material-symbols-rounded" style="font-size:14px">pin</span>More specific</button>
+      <button class="cardbtn" data-action="ship-today" data-tip="Preset: constrain to existing hardware and features only."><span class="material-symbols-rounded" style="font-size:14px">local_shipping</span>Ship today</button>
+      ${countForkGroups(v)>=1?`<button class="cardbtn trigger" data-action="view-tree" data-tip="Open the branch tree: a scrollable, content-view map of every branch on this version."><span class="material-symbols-rounded" style="font-size:14px">account_tree</span>View tree</button>`:''}
+      <button class="cardbtn" data-action="save-scenario" data-tip="Save this scenario (every version and its full branch tree) to reload later in this environment, or export a file to import elsewhere."><span class="material-symbols-rounded" style="font-size:14px">save</span>Save</button>
+      <div class="pager">
+        <button data-action="prev" ${card.currentVersionIndex<=0?'disabled':''} data-tip="Previous version"><span class="material-symbols-rounded" style="font-size:15px">chevron_left</span></button>
+        <span>${card.currentVersionIndex+1} of ${card.versions.length}</span>
+        <button data-action="next" ${card.currentVersionIndex>=card.versions.length-1?'disabled':''} data-tip="Next version"><span class="material-symbols-rounded" style="font-size:15px">chevron_right</span></button>
+      </div>
+    </div>
+  `;
+
+  wrap.querySelectorAll('[data-action]').forEach(btn=>{
+    const action = btn.getAttribute('data-action');
+    btn.addEventListener('click', ()=> handleCardAction(card, action, wrap, btn));
+  });
+  return wrap;
+}
+
+function renderStoryboardHtml(sb){
+  return `<div class="storyboard-panel">
+    <h4>Storyboard</h4>
+    <div class="panel-block"><div class="lbl">Style</div>${sb.styleBlock||''} · ${sb.aspectRatio||''}</div>
+    <div class="panel-block"><div class="lbl">Cast consistency</div>${sb.castConsistencyNote||''}</div>
+    ${(sb.panels||[]).map(p=>`<div class="panel-block"><div class="lbl">${p.beat}: ${p.shotType||''}</div>${p.cameraPrompt||''}<br><em>Devices: ${p.devicesVisible||''} · Lighting: ${p.lighting||''} · On-screen: ${p.onScreenText||''}</em></div>`).join('')}
+    <div class="panel-block"><div class="lbl">Video prompt</div>${sb.videoPrompt||''}</div>
+    <button class="cardbtn violet" data-action="copy-storyboard" data-tip="Copy the full storyboard as plain text.">Copy all</button>
+  </div>`;
+}
+
+function storyboardToText(v){
+  const sb = v.storyboard; if(!sb) return '';
+  let out = `TITLE: ${v.title}\nSTYLE: ${sb.styleBlock}\nASPECT RATIO: ${sb.aspectRatio}\nCAST CONSISTENCY: ${sb.castConsistencyNote}\n\n`;
+  (sb.panels||[]).forEach((p,i)=>{ out += `PANEL ${i+1}: ${p.beat} (${p.shotType})\n${p.cameraPrompt}\nDevices visible: ${p.devicesVisible}\nLighting: ${p.lighting}\nOn-screen text: ${p.onScreenText}\n\n`; });
+  out += `VIDEO PROMPT (continuous shot):\n${sb.videoPrompt}\n`;
+  return out;
+}
+
+function handleCardAction(card, action, wrap, btn){
+  const v = currentVersion(card);
+  if(action==='prev'){ card.currentVersionIndex = Math.max(0, card.currentVersionIndex-1); renderCards(); return; }
+  if(action==='next'){ card.currentVersionIndex = Math.min(card.versions.length-1, card.currentVersionIndex+1); renderCards(); return; }
+  if(action==='stop'){ card.opId++; card.busy=false; card.statusText=''; renderCards(); return; }
+  if(action==='regenerate'){ generateVersionForCard(card); return; }
+  if(action==='more-specific'){ card.instructions.push('Be more specific: use concrete real names, exact times, and real prices throughout.'); generateVersionForCard(card); return; }
+  if(action==='ship-today'){ card.instructions.push('Constrain strictly to existing hardware and features that ship today. Nothing speculative.'); generateVersionForCard(card); return; }
+  if(action==='copy-storyboard'){
+    const text = storyboardToText(v);
+    navigator.clipboard && navigator.clipboard.writeText(text);
+    return;
+  }
+  if(action==='view-tree'){ openTreeModal(card); return; }
+  if(action==='save-scenario'){ saveScenario(card).catch(err=> showToast('Save failed: '+err.message)); return; }
+  if(action==='info-tab'){
+    card.infoTab = btn.getAttribute('data-tab');
+    renderCards();
+    return;
+  }
+  if(action==='select-path'){
+    const pointer = JSON.parse(btn.getAttribute('data-pointer'));
+    const stepIndex = parseInt(btn.getAttribute('data-step-index'),10);
+    const pathIndex = parseInt(btn.getAttribute('data-path-index'),10);
+    const node = getBranchNode(v, pointer);
+    if(node && node.branches && node.branches[stepIndex]){ node.branches[stepIndex].active = pathIndex; }
+    syncAfterBranchChange(card);
+    return;
+  }
+  if(action==='branch-step'){
+    const pointer = JSON.parse(btn.getAttribute('data-pointer'));
+    const stepIndex = parseInt(btn.getAttribute('data-step-index'),10);
+    const node = getBranchNode(v, pointer);
+    if(!node) return;
+    const stepText = node.steps[stepIndex];
+    const slot = wrap.querySelector('.branch-slot');
+    const refineSlot = wrap.querySelector('.refine-slot');
+    if(refineSlot) refineSlot.innerHTML='';
+    if(slot.dataset.open==='1'){ slot.innerHTML=''; slot.dataset.open='0'; return; }
+    slot.innerHTML = branchFormHtml(card, stepIndex, stepText);
+    slot.dataset.open='1';
+    slot.querySelector('[data-cancel-branch]').addEventListener('click', ()=>{ slot.innerHTML=''; slot.dataset.open='0'; });
+    slot.querySelector('[data-submit-branch]').addEventListener('click', ()=>{
+      const count = Math.min(4, Math.max(2, parseInt(slot.querySelector('.branch-count').value,10) || 2));
+      const premiseHint = slot.querySelector('.branch-premise-input').value.trim();
+      slot.innerHTML=''; slot.dataset.open='0';
+      generateBranches(card, pointer, stepIndex, count, premiseHint);
+    });
+    return;
+  }
+  if(action==='storyboard'){
+    (async ()=>{
+      card.busy=true; card.statusText='Building storyboard…'; renderCards();
+      try{
+        const { parsed: sb } = await callModelJson(buildStoryboardPrompt(v), 1800);
+        v.storyboard = sb;
+      }catch(err){ showToast('Storyboard generation failed: '+err.message); }
+      card.busy=false; card.statusText=''; renderCards();
+    })();
+    return;
+  }
+  if(action==='refine'){
+    const slot = wrap.querySelector('.refine-slot');
+    const branchSlot = wrap.querySelector('.branch-slot');
+    if(branchSlot){ branchSlot.innerHTML=''; branchSlot.dataset.open='0'; }
+    if(slot.querySelector('textarea')){ slot.innerHTML=''; return; }
+    slot.innerHTML = `<div class="refine-box">
+      <textarea placeholder="e.g. remove the phone, add the Galaxy Watch, make the tone more playful…" data-tip="Type a refinement instruction. Device add/remove mentions are parsed and applied cumulatively on every future version too."></textarea>
+      <div class="rowbtns">
+        <button class="cardbtn" data-cancel>Cancel</button>
+        <button class="cardbtn violet" data-submit>Apply &amp; regenerate</button>
+      </div>
+    </div>`;
+    slot.querySelector('[data-cancel]').addEventListener('click', ()=>{ slot.innerHTML=''; });
+    slot.querySelector('[data-submit]').addEventListener('click', ()=>{
+      const text = slot.querySelector('textarea').value.trim();
+      if(!text) return;
+      applyKeywordSync(card, text);
+      card.instructions.push(text);
+      slot.innerHTML='';
+      generateVersionForCard(card);
+    });
+  }
+}
+
+
+const CARDS_PER_PAGE = 6;
+function renderCards(){
+  const container = document.getElementById('cardsContainer');
+  clearTooltipIfInside(container);
+  if(State.scenarios.length===0){
+    container.innerHTML = '<div class="empty-state">No scenarios yet. Set your brief above and click Generate, or use the import icon above to load a saved one.</div>';
+    renderCardsPagination(0, 0);
+    return;
+  }
+  const totalPages = Math.max(1, Math.ceil(State.scenarios.length / CARDS_PER_PAGE));
+  if(State.cardsPage > totalPages-1) State.cardsPage = totalPages-1;
+  if(State.cardsPage < 0) State.cardsPage = 0;
+  const start = State.cardsPage * CARDS_PER_PAGE;
+  const pageItems = State.scenarios.slice(start, start+CARDS_PER_PAGE);
+  container.innerHTML='';
+  pageItems.forEach((card,i)=> container.appendChild(renderCardEl(card, start+i)));
+  renderCardsPagination(State.cardsPage, totalPages);
+}
+function renderCardsPagination(page, totalPages){
+  let el = document.getElementById('cardsPagination');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'cardsPagination';
+    el.className = 'cards-pagination';
+    document.getElementById('cardsContainer').insertAdjacentElement('afterend', el);
+  }
+  if(totalPages<=1){ el.innerHTML=''; return; }
+  el.innerHTML = `
+    <button data-action="cards-prev" ${page<=0?'disabled':''} data-tip="Previous page of scenarios"><span class="material-symbols-rounded" style="font-size:16px">chevron_left</span></button>
+    <span>Page ${page+1} of ${totalPages}</span>
+    <button data-action="cards-next" ${page>=totalPages-1?'disabled':''} data-tip="Next page of scenarios"><span class="material-symbols-rounded" style="font-size:16px">chevron_right</span></button>
+  `;
+  el.querySelector('[data-action="cards-prev"]').addEventListener('click', ()=>{ State.cardsPage--; renderCards(); });
+  el.querySelector('[data-action="cards-next"]').addEventListener('click', ()=>{ State.cardsPage++; renderCards(); });
+}
+
+/* ============================= EXPORT ============================= */
+function versionToMd(card, i){
+  const v = currentVersion(card); if(!v) return '';
+  let out = `## ${i+1}. ${v.title||'Untitled'}\n\n`;
+  out += `*${card.seed.domain.name} · ${card.seed.cadence.name} · ${card.seed.trigger.name} · ${v.feasibility||''}*\n\n`;
+  out += `${v.narrative||''}\n\n`;
+  out += `**Devices:** ${(v.devices||[]).map(d=>d.name+' ('+d.role+')').join(', ')}\n\n`;
+  out += `**Apps:** ${(v.apps||[]).map(a=>typeof a==='string'?a:a.name).join(', ')}\n\n`;
+  if(v.steps&&v.steps.length) out += `**Flow:**\n${v.steps.map((s,idx)=>`${idx+1}. ${s}`).join('\n')}\n\n`;
+  if(v.jobToBeDone) out += `**Job to be done:** ${v.jobToBeDone}\n\n`;
+  if(v.userValue) out += `**User value:** ${v.userValue}\n\n`;
+  if(v.multiDeviceValue) out += `**Why multi-device:** ${v.multiDeviceValue}\n\n`;
+  if(v.friction) out += `**Friction:** ${v.friction}\n\n`;
+  if(v.privacy) out += `**Privacy:** ${v.privacy}\n\n`;
+  ['dataTouched','kpi','edgeCase','emotionalArc','crossSell'].forEach(k=>{ if(v[k]) out += `**${k}:** ${Array.isArray(v[k])?v[k].join(', '):v[k]}\n\n`; });
+  if(card.instructions.length) out += `**Refinements applied:** ${card.instructions.join(' | ')}\n\n`;
+  if(v.branches && Object.keys(v.branches).length) out += `**Branches:**\n\n${branchesToMd(v, 0)}\n`;
+  if(v.storyboard) out += `**Storyboard:**\n\n${storyboardToText(v).split('\n').map(l=>'> '+l).join('\n')}\n\n`;
+  return out;
+}
+function branchesToMd(node, depth){
+  if(!node || !node.branches) return '';
+  let out = '';
+  const indent = '  '.repeat(depth);
+  Object.entries(node.branches).forEach(([stepIdx, bg])=>{
+    out += `${indent}- Fork at step ${parseInt(stepIdx,10)+1}${bg.premiseHint?` (hint: ${bg.premiseHint})`:''}:\n`;
+    bg.paths.forEach((p,pi)=>{
+      out += `${indent}  - **${p.label}**${pi===bg.active?' (shown)':''}: ${p.premise||''}\n`;
+      p.steps.forEach((s,si)=> out += `${indent}    ${si+1}. ${s}\n`);
+      out += branchesToMd(p, depth+2);
+    });
+  });
+  return out;
+}
+document.getElementById('exportMdBtn').addEventListener('click', ()=>{
+  let md = `# Scenario Forge export\n\nPersona: ${State.persona} · Region: ${State.region} · Feasibility: ${State.feasibility} · Length: ${LENGTH_TIERS[State.length].label}\n\n`;
+  State.scenarios.forEach((card,i)=>{ md += versionToMd(card,i); });
+  downloadFile('scenario-forge-export.md', md, 'text/markdown');
+});
+document.getElementById('exportCsvBtn').addEventListener('click', ()=>{
+  const rows = [['#','title','domain','cadence','trigger','feasibility','devices','apps','narrative','refinements']];
+  State.scenarios.forEach((card,i)=>{
+    const v = currentVersion(card); if(!v) return;
+    rows.push([i+1, v.title||'', card.seed.domain.name, card.seed.cadence.name, card.seed.trigger.name, v.feasibility||'',
+      (v.devices||[]).map(d=>d.name).join('; '), (v.apps||[]).map(a=>typeof a==='string'?a:a.name).join('; '),
+      (v.narrative||'').replace(/\n/g,' '), card.instructions.join(' | ')]);
+  });
+  const csv = rows.map(r=> r.map(c=> `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  downloadFile('scenario-forge-export.csv', csv, 'text/csv');
+});
+function downloadFile(name, content, type){
+  try{
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>{ try{ URL.revokeObjectURL(url); }catch(e){} }, 1000);
+  }catch(err){
+    showToast('Could not trigger a file download in this environment: '+err.message);
+  }
+}
+
+/* ============================= SAVE / LOAD / IMPORT SCENARIOS (with full branch tree) ============================= */
+function serializeCard(card){
+  return {
+    formatVersion: 1,
+    savedAt: Date.now(),
+    seed: card.seed,
+    versions: card.versions,
+    currentVersionIndex: card.currentVersionIndex,
+    instructions: card.instructions,
+    excludedDeviceIds: card.excludedDeviceIds,
+    addedDeviceIds: card.addedDeviceIds,
+    infoTab: card.infoTab,
+    context: { persona: State.persona, region: State.region, feasibility: State.feasibility, length: State.length },
+  };
+}
+// Rebuilds a live card from a saved/imported snapshot. Custom devices/domains referenced by the
+// seed (added via the free-text rows) are merged back into the running taxonomy if this session
+// doesn't already have them, so branching and refining can continue exactly as before.
+function deserializeCard(data){
+  if(!data || !data.seed) throw new Error('File does not look like a saved Scenario Forge scenario.');
+  (data.seed.devices||[]).forEach(d=>{
+    if(d && d.id && d.id.startsWith('custom-') && !State.devices.find(x=>x.id===d.id)){
+      State.devices.push(d);
+      const group = d.group==='personal' ? 'personal' : 'home';
+      if(!(d.id in State.pillState[group])) State.pillState[group][d.id]='allowed';
+    }
+  });
+  if(data.seed.domain && data.seed.domain.id && data.seed.domain.id.startsWith('custom-') && !State.domains.find(x=>x.id===data.seed.domain.id)){
+    State.domains.push(data.seed.domain);
+    State.pillState.domains[data.seed.domain.id]='allowed';
+  }
+  State.scenarioCounter++;
+  const card = {
+    id: 'card-'+State.scenarioCounter,
+    seed: data.seed,
+    versions: data.versions || [],
+    currentVersionIndex: typeof data.currentVersionIndex==='number' ? data.currentVersionIndex : ((data.versions||[]).length-1),
+    busy: false, opId: 0,
+    instructions: data.instructions || [],
+    excludedDeviceIds: data.excludedDeviceIds || [],
+    addedDeviceIds: data.addedDeviceIds || [],
+    infoTab: data.infoTab || 'jtbd',
+  };
+  if(card.seed && card.seed.id && !State.seeds.some(s=>s.id===card.seed.id)) State.seeds.push(card.seed);
+  return card;
+}
+// A filesystem-safe timestamp (no colons or slashes) for the downloaded file name only.
+// This never touches the card's title, versions, or any other displayed field.
+function fileTimestamp(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+}
+async function saveScenario(card){
+  const data = serializeCard(card);
+  const v = currentVersion(card);
+  const title = (v && v.title) || 'Scenario';
+  const stamp = new Date().toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+  const name = `${title} · ${stamp}`;
+  await Store.set('scenario:'+name, JSON.stringify(data));
+  await refreshSavedScenariosList();
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'scenario';
+  downloadFile(`${slug}-${fileTimestamp()}.json`, JSON.stringify(data, null, 2), 'application/json');
+  showToast('Saved. Find it under "Load saved scenario" here, and a file downloaded for importing elsewhere.');
+}
+function loadScenarioFromData(data){
+  const card = deserializeCard(data);
+  State.scenarios.push(card);
+  State.cardsPage = Math.max(0, Math.ceil(State.scenarios.length / CARDS_PER_PAGE) - 1);
+  renderCards(); renderMatrixMetrics(); runBriefCheck();
+}
+async function loadSavedScenarioByKey(key){
+  try{
+    const raw = await Store.get(key);
+    if(!raw) return;
+    loadScenarioFromData(JSON.parse(raw));
+    showToast('Scenario loaded.');
+  }catch(err){ showToast('Could not load scenario: '+err.message); }
+}
+// A dropdown only earns its keep once there's an actual choice to make. With zero saved
+// scenarios there's nothing to show (the import icon already covers loading from elsewhere);
+// with exactly one, a single load button is more honest than a one-item picker; a real <select>
+// only appears once there are 2+ to choose between.
+async function refreshSavedScenariosList(){
+  const keys = await Store.list('scenario:');
+  const container = document.getElementById('savedScenariosControl');
+  if(!container) return;
+  container.innerHTML = '';
+  if(keys.length===0) return;
+  if(keys.length===1){
+    const key = keys[0];
+    const name = key.slice('scenario:'.length);
+    const btn = document.createElement('button');
+    btn.className = 'smallbtn load-one-btn';
+    btn.setAttribute('data-tip', `Load your one saved scenario: ${name}.`);
+    btn.innerHTML = `<span class="material-symbols-rounded">bookmark</span>${name}`;
+    btn.addEventListener('click', ()=> loadSavedScenarioByKey(key));
+    container.appendChild(btn);
+    return;
+  }
+  const sel = document.createElement('select');
+  sel.className = 'mini-select';
+  sel.setAttribute('data-tip', 'Load a scenario (including its full versions and branch tree) that you previously saved in this environment.');
+  sel.innerHTML = '<option value="">Load saved scenario…</option>' + keys.map(k=>{
+    const name = k.slice('scenario:'.length);
+    return `<option value="${k}">${name}</option>`;
+  }).join('');
+  sel.addEventListener('change', (e)=>{
+    const key = e.target.value; if(!key) return;
+    e.target.value = '';
+    loadSavedScenarioByKey(key);
+  });
+  container.appendChild(sel);
+}
+document.getElementById('importScenarioBtn').addEventListener('click', ()=>{
+  document.getElementById('importScenarioFile').click();
+});
+document.getElementById('importScenarioFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      loadScenarioFromData(JSON.parse(reader.result));
+      showToast('Scenario imported.');
+    }catch(err){ showToast('Could not import file: '+err.message); }
+  };
+  reader.onerror = ()=> showToast('Could not read that file.');
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ============================= SAVED BRIEFS ============================= */
+function serializeBrief(){
+  return JSON.stringify({
+    pillState: State.pillState,
+    customDevices: State.devices.filter(d=>d.id.startsWith('custom-')),
+    customDomains: State.domains.filter(d=>d.id.startsWith('custom-')),
+    customApps: State.apps.filter(a=>a.id.startsWith('custom-')),
+    googleIncluded: State.googleIncluded,
+    persona: State.persona, region: State.region, feasibility: State.feasibility,
+    length: State.length, count: State.count, refinementPass: State.refinementPass,
+  });
+}
+function applyBriefData(brief){
+  State.pillState = brief.pillState;
+  (brief.customDevices||[]).forEach(d=>{ if(!State.devices.find(x=>x.id===d.id)) State.devices.push(d); });
+  (brief.customDomains||[]).forEach(d=>{ if(!State.domains.find(x=>x.id===d.id)) State.domains.push(d); });
+  (brief.customApps||[]).forEach(a=>{ if(!State.apps.find(x=>x.id===a.id)) State.apps.push(a); });
+  State.googleIncluded = brief.googleIncluded||false;
+  document.getElementById('googleToggle').setAttribute('aria-checked', String(State.googleIncluded));
+  State.persona = brief.persona; State.region = brief.region; State.feasibility = brief.feasibility;
+  State.length = brief.length; State.count = brief.count; State.refinementPass = brief.refinementPass;
+  document.getElementById('countRange').value = State.count;
+  document.getElementById('refineToggle').checked = State.refinementPass;
+  renderAll();
+}
+async function loadBriefByKey(key){
+  const raw = await Store.get(key);
+  if(!raw) return;
+  applyBriefData(JSON.parse(raw));
+  showToast('Brief loaded.');
+}
+// Same reasoning as the scenarios control: no dropdown for zero or one option. The field
+// itself hides entirely with nothing saved, so the app bar doesn't show a bookmark icon
+// pointing at an empty picker.
+async function refreshSavedBriefsList(){
+  const keys = await Store.list('brief:');
+  const field = document.getElementById('savedBriefsField');
+  const container = document.getElementById('savedBriefsControl');
+  if(!container) return;
+  container.innerHTML = '';
+  if(keys.length===0){ if(field) field.style.display='none'; return; }
+  if(field) field.style.display='';
+  if(keys.length===1){
+    const key = keys[0];
+    const name = key.slice('brief:'.length);
+    const btn = document.createElement('button');
+    btn.className = 'load-one-btn';
+    btn.setAttribute('data-tip', `Load your one saved brief: ${name}.`);
+    btn.textContent = name;
+    btn.addEventListener('click', ()=> loadBriefByKey(key));
+    container.appendChild(btn);
+    return;
+  }
+  const sel = document.createElement('select');
+  sel.setAttribute('data-tip', 'Load a previously saved pill configuration and settings.');
+  sel.innerHTML = '<option value="">Saved briefs…</option>' + keys.map(k=>{
+    const name = k.slice('brief:'.length);
+    return `<option value="${k}">${name}</option>`;
+  }).join('');
+  sel.addEventListener('change', (e)=>{
+    const key = e.target.value; if(!key) return;
+    loadBriefByKey(key);
+  });
+  container.appendChild(sel);
+}
+document.getElementById('saveBriefBtn').addEventListener('click', async ()=>{
+  // window.prompt/confirm may be silently blocked in sandboxed iframes, so never rely on them.
+  // Auto-name the brief from its defining traits and let the person rename via re-save if they want.
+  const reqCount = ['personal','home','apps','domains','cadence'].reduce((s,sec)=> s+requiredIds(sec).length, 0);
+  const stamp = new Date().toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+  const name = `${State.persona.split(',')[0]} · ${State.region} · ${reqCount} required · ${stamp}`;
+  const json = serializeBrief();
+  await Store.set('brief:'+name, json);
+  await refreshSavedBriefsList();
+  downloadFile(`brief-${fileTimestamp()}.json`, JSON.stringify(JSON.parse(json), null, 2), 'application/json');
+  showToast('Brief saved. Find it in the bookmark field above, and a file downloaded for importing elsewhere.');
+});
+document.getElementById('importBriefBtn').addEventListener('click', ()=>{
+  document.getElementById('importBriefFile').click();
+});
+document.getElementById('importBriefFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      applyBriefData(JSON.parse(reader.result));
+      showToast('Brief imported.');
+    }catch(err){ showToast('Could not import file: '+err.message); }
+  };
+  reader.onerror = ()=> showToast('Could not read that file.');
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ============================= DARK MODE ============================= */
+async function initTheme(){
+  const saved = await Store.get('theme');
+  const theme = saved || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeIcon').textContent = theme==='dark' ? 'light_mode' : 'dark_mode';
+}
+document.getElementById('themeToggle').addEventListener('click', async ()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('themeIcon').textContent = next==='dark' ? 'light_mode' : 'dark_mode';
+  await Store.set('theme', next);
+});
+
+document.getElementById('providerSelect').addEventListener('change', async (e)=>{
+  State.provider = e.target.value;
+  await Store.set('provider', State.provider);
+});
+async function initProvider(){
+  const saved = await Store.get('provider');
+  State.provider = (saved && PROVIDERS[saved]) ? saved : 'gemini';
+  document.getElementById('providerSelect').value = State.provider;
+}
+
+/* ============================= INIT ============================= */
+function renderAll(){
+  renderPills();
+  renderConfig();
+  runBriefCheck();
+  renderMatrixMetrics();
+  renderCards();
+}
+
+async function init(){
+  await initTheme();
+  await initProvider();
+  const savedPersonas = await Store.get('custom-personas');
+  if(savedPersonas){ try{ State.customPersonas = JSON.parse(savedPersonas); }catch(e){} }
+  await refreshSavedBriefsList();
+  await refreshSavedScenariosList();
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>
